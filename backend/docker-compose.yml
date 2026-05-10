@@ -1,0 +1,25 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: ai_expense_postgres
+    volumes:
+      - ai_expense_postgres_data:/var/lib/postgresql/data
+
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: ai_expense
+    ports:
+      - "5434:5432"
+
+  redis:
+    image: redis:7
+    container_name: ai_expense_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - ai_expense_redis_data:/data
+
+volumes:
+  ai_expense_postgres_data:
+  ai_expense_redis_data:

@@ -1,0 +1,57 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+model User {
+  id           String @id @default(uuid())
+  email        String @unique
+  passwordHash String
+
+  role UserRole @default(USER)
+
+  createdAt DateTime @default(now())
+
+  transactions Transaction[]
+
+  //"In my code, I want to refer to this model as User, but in the actual database, the table is named users.
+  @@map("users")
+}
+
+model Transaction {
+  id String @id @default(uuid())
+
+  userId String
+
+  amount Decimal
+
+  descriptionRaw        String
+  descriptionNormalized String?
+
+  merchantName String?
+  category     String?
+
+  transactionDate DateTime
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId, transactionDate(sort: Desc)])
+  @@index([merchantName])
+  @@map("transactions")
+}

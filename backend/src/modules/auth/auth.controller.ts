@@ -25,3 +25,13 @@ export const login = async (req: Request, res: Response) => {
     data: result,
   });
 };
+
+export const getMe = async (req: Request, res: Response) => {
+  const userId = req.user!.sub;
+  const result = await authService.getMe(userId);
+
+  return res.status(200).json({
+    message: "User data retrieved successfully",
+    data: result,
+  });
+};

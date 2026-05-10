@@ -15,5 +15,5 @@ app.use(errorMiddeware);
 app.use(cors({ origin: true, credentials: true }));
 
 // routes
-app.use("/health", healthRouter);
-app.use("/auth", authRouter);
+app.use("/api/v1/health", healthRouter);
+app.use("/api/v1/auth", authRouter);

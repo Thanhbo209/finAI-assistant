@@ -51,3 +51,17 @@ export const login = async ({ email, password }: LoginBody) => {
     refreshToken,
   };
 };
+
+export const getMe = async (userId: string) => {
+  const user = await authRepository.findUserById(userId);
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  return {
+    id: user.id,
+    email: user.email,
+    role: user.role,
+    createdAt: user.createdAt,
+  };
+};

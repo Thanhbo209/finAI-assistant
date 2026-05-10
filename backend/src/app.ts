@@ -7,9 +7,9 @@ import { errorMiddeware } from "./common/middleware/error.middleware.js";
 
 export const app = express();
 // Middlewares
+
 app.use(express.json());
 app.use(cookieParser());
-app.use(errorMiddeware);
 
 // Allow cors
 app.use(cors({ origin: true, credentials: true }));
@@ -17,3 +17,5 @@ app.use(cors({ origin: true, credentials: true }));
 // routes
 app.use("/api/v1/health", healthRouter);
 app.use("/api/v1/auth", authRouter);
+
+app.use(errorMiddeware);

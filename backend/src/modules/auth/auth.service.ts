@@ -1,3 +1,4 @@
+import { AppError } from "../../common/error/app.error.js";
 import { comparePassword, hashPassword } from "../../common/util/bcrypt.js";
 import {
   generateAccessToken,
@@ -19,7 +20,7 @@ export const register = async ({ email, password }: RegisterBody) => {
   const existingUser = await authRepository.findUserByEmail(email);
 
   if (existingUser) {
-    throw new Error("Email already exists!");
+    throw new AppError("Email already exists!", 401);
   }
 
   const passwordHash = await hashPassword(password);
@@ -35,12 +36,12 @@ export const register = async ({ email, password }: RegisterBody) => {
 export const login = async ({ email, password }: LoginBody) => {
   const user = await authRepository.findUserByEmail(email);
   if (!user) {
-    throw new Error("Invalid credentials");
+    throw new AppError("Invalid credentials");
   }
   const isPasswordValid = await comparePassword(password, user.passwordHash);
 
   if (!isPasswordValid) {
-    throw new Error("Invalid credentials");
+    throw new AppError("Invalid credentials", 401);
   }
 
   const accessToken = generateAccessToken(user.id, user.role);
@@ -55,7 +56,7 @@ export const login = async ({ email, password }: LoginBody) => {
 export const getMe = async (userId: string) => {
   const user = await authRepository.findUserById(userId);
   if (!user) {
-    throw new Error("User not found");
+    throw new AppError("User not found", 400);
   }
 
   return {

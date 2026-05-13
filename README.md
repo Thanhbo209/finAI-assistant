@@ -6,6 +6,9 @@
 
 # 📖 Overview
 
+<img width="1774" height="887" alt="introducing" src="https://github.com/user-attachments/assets/7ce2e60d-6cc6-4ec3-be3e-6902485b4531" />
+
+
 FinAI is an AI-first expense intelligence platform designed around one core principle:
 
 **financial tracking should feel like conversation, not accounting software.**
@@ -27,8 +30,6 @@ The platform combines:
 * Async processing
 * Behavioral insight generation
 
-<img width="1024" height="572" alt="finAi" src="https://github.com/user-attachments/assets/ee38c6e6-d86a-43eb-a0d6-7a99d16bf700" />
-
 
 The result is a financial system optimized for:
 
@@ -48,9 +49,9 @@ AI never directly mutates financial data.
 
 Flow:
 
-```txt
-AI Suggestion → User Confirmation → Persistence
-```
+<img width="1536" height="1024" alt="human-in-the-loop" src="https://github.com/user-attachments/assets/9a454d4c-f111-414c-ac40-e79acddb870b" />
+
+
 
 Every transaction requires explicit confirmation before saving.
 
@@ -62,16 +63,8 @@ FinAI avoids pure-LLM parsing.
 
 Pipeline:
 
-```txt
-Raw Input
-→ Normalization
-→ Regex Extraction
-→ Confidence Scoring
-→ AI Enrichment (only if needed)
-→ User Preview
-→ Confirmation
-→ Persistence
-```
+<img width="1774" height="887" alt="hyberidAIparsing" src="https://github.com/user-attachments/assets/e28dfd83-ee40-4988-80bb-2959c9b14ad1" />
+
 
 This reduces:
 

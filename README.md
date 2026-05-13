@@ -27,6 +27,9 @@ The platform combines:
 * Async processing
 * Behavioral insight generation
 
+<img width="1024" height="572" alt="finAi" src="https://github.com/user-attachments/assets/ee38c6e6-d86a-43eb-a0d6-7a99d16bf700" />
+
+
 The result is a financial system optimized for:
 
 * Speed

@@ -17,6 +17,26 @@ enum UserRole {
   ADMIN
 }
 
+enum TransactionCategory {
+  FOOD_DRINK
+  TRANSPORTATION
+  GROCERIES
+  SUBSCRIPTIONS
+  ENTERTAINMENT
+  SHOPPING
+  HEALTH
+  UTILITIES
+  TRAVEL
+  UNKNOWN
+}
+
+enum TransactionStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
 model User {
   id           String @id @default(uuid())
   email        String @unique
@@ -39,11 +59,64 @@ model Transaction {
 
   amount Decimal
 
-  descriptionRaw        String
+  currency String @default("USD")
+
+  // parser certainty measurement
+  // deciding follow-up questions
+  // analytics quality
+  // debugging parser accuracy
+  // future AI tuning
+  confidenceScore Float?
+
+  // background workers
+  // retries
+  // queue       systems
+  aiProcessed Boolean @default(false)
+
+  processingStatus TransactionStatus
+
+  // separates:
+  // AI guess
+  // user-approved financial truth
+  isConfirmed Boolean @default(false)
+
+  // identifies ingestion source
+  // analytics
+  // debugging
+  // ingestion optimization
+  sourceType String?
+
+  // debugging
+  // reparsing historical data
+  // regression analysis
+  parserVersion String?
+
+  // preserves original user input EXACTLY
+  // debugging
+  // reparsing
+  // auditability
+  // future AI improvements
+  descriptionRaw String
+
+  // cleaned/preprocessed version
+  // regex matching
+  // search
+  // analytics
+  // merchant detection
   descriptionNormalized String?
 
+  // canonical merchant identity
+  // merchant analytics
+  // recurring spending detection
+  // categorization
   merchantName String?
-  category     String?
+
+  // semantic spending classification
+  // dashboards
+  // charts
+  // summaries
+  // insights
+  category TransactionCategory
 
   transactionDate DateTime
 

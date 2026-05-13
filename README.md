@@ -199,12 +199,7 @@ Used for:
 
 ### Performance Targets
 
-| Metric                      | Target               |
-| --------------------------- | -------------------- |
-| Deterministic parse latency | < 100ms              |
-| Known merchant accuracy     | 95%+                 |
-| Parser test coverage        | 30+ input variations |
-| AI cost reduction           | ~80% fewer AI calls  |
+<img width="1717" height="916" alt="performance-target" src="https://github.com/user-attachments/assets/7c18d8c6-be6a-4bcf-940c-64a899cd9848" />
 
 ### Example Inputs
 

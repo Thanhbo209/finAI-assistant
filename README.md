@@ -270,11 +270,8 @@ Used for:
 
 ### Performance Targets
 
-| Metric                      | Target                        |
-| --------------------------- | ----------------------------- |
-| Dashboard response time     | < 200ms (cached)              |
-| Analytics recomputation     | < 5 seconds                   |
-| Recurring expense detection | After 3 matching transactions |
+<img width="1672" height="941" alt="dashboard-target" src="https://github.com/user-attachments/assets/306d4e9a-618c-43b4-b3bf-3bb9a2a40c37" />
+
 
 ### 📈 Analytics Concepts
 
@@ -515,27 +512,7 @@ GET /analytics/recurring
 
 ## High-Level System Flow
 
-```txt
-Frontend (React)
-    ↓
-Express API
-    ↓
-Parser Pipeline
-    ↓
-Confidence Engine
-    ↓
-AI Enrichment (conditional)
-    ↓
-User Confirmation
-    ↓
-PostgreSQL Persistence
-    ↓
-BullMQ Events
-    ↓
-Analytics Workers
-    ↓
-Redis Cache
-```
+<img width="1717" height="916" alt="overview" src="https://github.com/user-attachments/assets/a04a0202-87ae-4ed9-bdd1-881d887b6bc6" />
 
 ---
 

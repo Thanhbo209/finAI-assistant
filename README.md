@@ -1,10 +1,10 @@
-# FinAI
+# 🚀 FinAI
 
 > AI-powered financial operating system focused on natural-language expense ingestion, hybrid AI parsing, and behavioral financial insights.
 
 ---
 
-# Overview
+# 📖 Overview
 
 FinAI is an AI-first expense intelligence platform designed around one core principle:
 
@@ -40,7 +40,7 @@ The result is a financial system optimized for:
 
 ---
 
-# Core Product Principles
+# 🧠 Core Product Principles
 
 ## Human-in-the-Loop AI
 
@@ -95,9 +95,9 @@ Nothing is hidden.
 
 ---
 
-# Tech Stack
+# 🛠️ Tech Stack
 
-## Frontend
+## 🎨 Frontend
 
 * React
 * TypeScript
@@ -108,7 +108,7 @@ Nothing is hidden.
 
 ---
 
-## Backend
+## ⚙️ Backend
 
 * Node.js
 * Express.js
@@ -120,14 +120,14 @@ Nothing is hidden.
 
 ---
 
-## Database
+## 🗄️ Database
 
 * PostgreSQL
 * Prisma ORM
 
 ---
 
-## Queue & Async Processing
+## 🔄 Queue & Async Processing
 
 * Redis
 * BullMQ
@@ -141,7 +141,7 @@ Used for:
 
 ---
 
-## AI Layer
+## 🤖 AI Layer
 
 ### Deterministic Layer
 
@@ -160,7 +160,7 @@ Used for:
 
 ---
 
-## Infrastructure
+## 🐳 Infrastructure
 
 * Docker
 * Docker Compose
@@ -169,9 +169,9 @@ Used for:
 
 ---
 
-# MVP Roadmap
+# 🗺️ MVP Roadmap
 
-## Phase 1 — Backend Foundation
+## 🧱 Phase 1 — Backend Foundation
 
 ### Goals
 
@@ -193,7 +193,7 @@ Used for:
 
 ---
 
-## Phase 2 — Transaction Ingestion
+## 💬 Phase 2 — Transaction Ingestion
 
 ### Goals
 
@@ -240,7 +240,7 @@ Used for:
 
 ---
 
-## Phase 3 — Human-in-the-Loop AI
+## 👤 Phase 3 — Human-in-the-Loop AI
 
 ### Goals
 
@@ -268,7 +268,7 @@ Used for:
 
 ---
 
-## Phase 4 — Analytics & Insights
+## 📊 Phase 4 — Analytics & Insights
 
 ### Features
 
@@ -288,7 +288,7 @@ Used for:
 | Analytics recomputation     | < 5 seconds                   |
 | Recurring expense detection | After 3 matching transactions |
 
-### Analytics Concepts
+### 📈 Analytics Concepts
 
 * GROUP BY aggregations
 * Window functions
@@ -298,7 +298,7 @@ Used for:
 
 ---
 
-## Phase 5 — AI Enhancement Layer
+## ✨ Phase 5 — AI Enhancement Layer
 
 ### Features
 
@@ -320,7 +320,7 @@ Used for:
 
 ---
 
-# Key Features
+# ⭐ Key Features
 
 ## Natural Language Expense Capture
 
@@ -332,7 +332,7 @@ No manual categorization.
 
 ---
 
-## Hybrid AI Parsing Engine
+## ⚡ Hybrid AI Parsing Engine
 
 Deterministic parsing runs first.
 
@@ -347,7 +347,7 @@ Benefits:
 
 ---
 
-## Confidence Scoring System
+## 🎯 Confidence Scoring System
 
 Every parsed field receives a confidence score.
 
@@ -373,7 +373,7 @@ Before persistence:
 
 ---
 
-## Async Analytics Pipeline
+## 🔄 Async Analytics Pipeline
 
 Analytics processing is fully asynchronous.
 
@@ -389,7 +389,7 @@ Transaction Confirmed
 
 ---
 
-## Recurring Expense Detection
+## 🔁 Recurring Expense Detection
 
 Background workers identify:
 
@@ -400,7 +400,7 @@ Background workers identify:
 
 ---
 
-## Smart Financial Insights
+## 💡 Smart Financial Insights
 
 Example outputs:
 
@@ -418,9 +418,9 @@ Example outputs:
 
 ---
 
-# API Endpoints
+# 🔌 API Endpoints
 
-## Authentication
+## 🔐 Authentication
 
 ### Register
 
@@ -442,7 +442,7 @@ POST /auth/refresh
 
 ---
 
-## Transactions
+## 💸 Transactions
 
 ### Parse Natural Language Input
 
@@ -523,7 +523,7 @@ GET /analytics/recurring
 
 ---
 
-# Architecture Overview
+# 🏗️ Architecture Overview
 
 ## High-Level System Flow
 
@@ -551,7 +551,7 @@ Redis Cache
 
 ---
 
-# Testing Strategy
+# 🧪 Testing Strategy
 
 ## Parser Testing
 
@@ -574,7 +574,7 @@ Coverage includes:
 
 ---
 
-# Engineering Rules
+# 📏 Engineering Rules
 
 ## Do
 
@@ -596,7 +596,7 @@ Coverage includes:
 
 ---
 
-# Scaling Strategy
+# 📦 Scaling Strategy
 
 ## Initial MVP
 
@@ -622,7 +622,7 @@ Potential scale-out architecture:
 
 ---
 
-# Why This Architecture
+# 🎯 Why This Architecture
 
 Most finance apps fail because they optimize for features instead of user friction.
 
@@ -644,7 +644,7 @@ The architecture intentionally avoids:
 
 ---
 
-# Future Vision
+# 🔮 Future Vision
 
 FinAI evolves from:
 
@@ -665,8 +665,3 @@ Long-term capabilities:
 * Voice-first finance interaction
 * Autonomous budgeting systems
 
----
-
-# License
-
-MIT

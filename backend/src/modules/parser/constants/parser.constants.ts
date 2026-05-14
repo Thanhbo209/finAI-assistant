@@ -17,7 +17,7 @@ export const CONFIDENCE = {
 
 /**
  * Weights used when composing per-field confidences into a single score.
- * Calculate the confidence score by mutiply with weights Not all fields are equally important
+ * Calculate the confidence score by multiplying with weights Not all fields are equally important
  * Must sum to 1.0.
  */
 

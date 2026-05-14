@@ -1,6 +1,7 @@
 import type { MissingField } from "../constants/parser.constants.js";
 import {
   MISSING_FIELD_PRIORITY,
+  MAX_COMBINED_FIELDS,
   SUPPRESS_CATEGORY_QUESTION,
 } from "./follow-up.constants.js";
 import {
@@ -102,11 +103,12 @@ export function generateFollowUp(input: GeneratorFollowUpInput): string | null {
 
   if (prioritized.length === 0) return null;
 
-  const [first, second] = prioritized;
+  const fieldsToAsk = prioritized.slice(0, MAX_COMBINED_FIELDS);
+  const [first, second] = fieldsToAsk;
 
   const firstQuestion = buildSingleQuestion(first!, input);
 
-  if (prioritized.length === 1 || second === undefined) {
+  if (fieldsToAsk.length === 1 || second === undefined) {
     return firstQuestion;
   }
 

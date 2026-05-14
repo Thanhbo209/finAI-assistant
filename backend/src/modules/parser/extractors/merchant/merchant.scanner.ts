@@ -45,8 +45,10 @@ export function scanExactAliases(input: string): MerchantCandidate[] {
  * produce partial matches that compete with exact matches and add noise
  * to the selector.
  *
- * Partial matching catches typos like "netflx" or short-form inputs like
- * "amzn".  Confidence is lower to reflect the reduced certainty.
+ * Partial matching catches prefix matches (e.g., "netfl" → "netflix")
+ * and compound words (e.g., "ubereats" → "uber").
+ * Confidence is lower to reflect the reduced certainty.
+ *
  *
  * Note: this is intentionally conservative — only single-token aliases
  * are considered for partial matching.  Multi-token aliases ("uber eats")

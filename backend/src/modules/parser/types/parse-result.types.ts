@@ -12,7 +12,7 @@ export interface ParseResult {
   currency: string;
   merchantName: string | null;
   category: Category;
-  transactionDate: Date;
+  transactionDate: Date | null;
 
   // ── Input representation ──────────────────────────────────────────
   /** Exactly what the user typed — stored verbatim in DB */

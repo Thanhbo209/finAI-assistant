@@ -19,7 +19,7 @@ CREATE TABLE "users" (
 CREATE TABLE "transactions" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
-    "amount" DECIMAL(65,30) NOT NULL,
+    "amount" DECIMAL(19,4) NOT NULL,
     "currency" TEXT NOT NULL DEFAULT 'USD',
     "confidenceScore" DOUBLE PRECISION,
     "aiProcessed" BOOLEAN NOT NULL DEFAULT false,

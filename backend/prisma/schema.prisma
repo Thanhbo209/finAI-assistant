@@ -116,7 +116,7 @@ model Transaction {
   // charts
   // summaries
   // insights
-  category TransactionCategory
+  category TransactionCategory @default(UNKNOWN)
 
   transactionDate DateTime
 

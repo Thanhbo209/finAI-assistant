@@ -57,7 +57,7 @@ model Transaction {
 
   userId String
 
-  amount Decimal
+  amount Decimal @db.Decimal(19, 4)
 
   currency String @default("USD")
 

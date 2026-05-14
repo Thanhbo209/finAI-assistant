@@ -73,7 +73,7 @@ model Transaction {
   // queue       systems
   aiProcessed Boolean @default(false)
 
-  processingStatus TransactionStatus
+  processingStatus TransactionStatus @default(PENDING)
 
   // separates:
   // AI guess

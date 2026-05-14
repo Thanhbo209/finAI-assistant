@@ -23,7 +23,7 @@ CREATE TABLE "transactions" (
     "currency" TEXT NOT NULL DEFAULT 'USD',
     "confidenceScore" DOUBLE PRECISION,
     "aiProcessed" BOOLEAN NOT NULL DEFAULT false,
-    "processingStatus" "TransactionStatus" NOT NULL,
+    "processingStatus" "TransactionStatus" NOT NULL DEFAULT 'PENDING',
     "isConfirmed" BOOLEAN NOT NULL DEFAULT false,
     "sourceType" TEXT,
     "parserVersion" TEXT,

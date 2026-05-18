@@ -56,11 +56,16 @@ const PERFECT: ComposeConfidenceInput = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe("composeConfidence() — spec scenarios", () => {
-  it("perfect parse → high score near 0.94", () => {
+  it("perfect parse → high score matches weighted sum", () => {
     const { score } = composeConfidence(PERFECT);
-    // 0.95×0.40 + 0.95×0.35 + 0.95×0.15 + 0.90×0.10
-    // = 0.380 + 0.3325 + 0.1425 + 0.090 = 0.945
-    expect(score).toBeCloseTo(0.945, 3);
+
+    // Dynamic calculation based on current weights (Amount, Merchant, Category)
+    const expectedScore =
+      0.95 * FIELD_WEIGHTS.amount +
+      0.95 * FIELD_WEIGHTS.merchant +
+      0.9 * FIELD_WEIGHTS.category;
+
+    expect(score).toBeCloseTo(expectedScore, 3);
   });
 
   it("missing amount → severe penalty applied", () => {
@@ -70,10 +75,21 @@ describe("composeConfidence() — spec scenarios", () => {
       missingFields: ["amount"],
     });
     expect(breakdown.totalPenalty).toBe(MISSING_FIELD_PENALTIES.MISSING_AMOUNT);
-    // rawWeightedScore is low because amount (0.10) contributes 0.10×0.40 = 0.04
-    // rawWeightedScore ≈ 0.04 + 0.3325 + 0.1425 + 0.090 = 0.605
-    // minus penalty 0.30 → 0.305
+    // Score should drop significantly due to missing amount penalty
     expect(score).toBeLessThan(0.4);
+  });
+
+  it("missing merchant → mild penalty only", () => {
+    const { score, breakdown } = composeConfidence({
+      ...PERFECT,
+      merchantResult: merchant(null, 0.1),
+      missingFields: ["merchant"],
+    });
+    expect(breakdown.totalPenalty).toBe(
+      MISSING_FIELD_PENALTIES.MISSING_MERCHANT,
+    );
+    // Score remains relatively healthy despite missing merchant
+    expect(score).toBeGreaterThan(0.55);
   });
 
   it("missing merchant → mild penalty only", () => {
@@ -100,7 +116,7 @@ describe("composeConfidence() — spec scenarios", () => {
       MISSING_FIELD_PENALTIES.UNKNOWN_CATEGORY,
     );
     // Score should still be high — unknown category barely moves it
-    expect(score).toBeGreaterThan(0.85);
+    expect(score).toBeGreaterThan(0.8);
   });
 
   it("low-confidence merchant → naturally lower score without extra penalty", () => {
@@ -122,8 +138,8 @@ describe("composeConfidence() — spec scenarios", () => {
       amountResult: amount(10, 0.1), // ambiguous multi-number
       missingFields: [],
     });
-    // Amount contribution: 0.10 × 0.40 = 0.04
-    expect(breakdown.weightedAmount).toBeCloseTo(0.04, 3);
+    // Amount contribution: 0.10 × 0.50 = 0.05
+    expect(breakdown.weightedAmount).toBeCloseTo(0.05, 3);
   });
 
   it("all defaults (date=default, category=Unknown, no merchant) → below medium threshold", () => {
@@ -134,7 +150,7 @@ describe("composeConfidence() — spec scenarios", () => {
       missingFields: ["merchant"],
     });
     // Still has a good amount — should be moderate, not catastrophically low
-    expect(score).toBeGreaterThan(0.2);
+    expect(score).toBeGreaterThan(0.15);
     expect(score).toBeLessThan(0.65);
   });
 });
@@ -144,7 +160,7 @@ describe("composeConfidence() — spec scenarios", () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe("composeConfidence() — math verification", () => {
-  it("rawWeightedScore equals sum of four weighted contributions", () => {
+  it("rawWeightedScore equals sum of three weighted contributions", () => {
     const { breakdown } = composeConfidence(PERFECT);
     const expectedRaw =
       breakdown.weightedAmount +
@@ -245,7 +261,6 @@ describe("composeConfidence() — field weight dominance", () => {
     amountResult: amount(45, 1.0),
     merchantResult: merchant("Uber", 1.0),
     categoryResult: category("Transportation", 1.0),
-    dateResult: date("explicit", 1.0),
     missingFields: [] as never[],
   };
 
@@ -261,28 +276,16 @@ describe("composeConfidence() — field weight dominance", () => {
     expect(dropAmount).toBeLessThan(dropMerchant);
   });
 
-  it("dropping merchant confidence has greater impact than dropping date", () => {
+  it("dropping merchant confidence has greater impact than dropping category", () => {
     const dropMerchant = composeConfidence({
       ...BASE,
       merchantResult: merchant("Uber", 0),
-    }).score;
-    const dropDate = composeConfidence({
-      ...BASE,
-      dateResult: date("default", 0),
-    }).score;
-    expect(dropMerchant).toBeLessThan(dropDate);
-  });
-
-  it("dropping date confidence has greater impact than dropping category", () => {
-    const dropDate = composeConfidence({
-      ...BASE,
-      dateResult: date("default", 0),
     }).score;
     const dropCategory = composeConfidence({
       ...BASE,
       categoryResult: category("Transportation", 0),
     }).score;
-    expect(dropDate).toBeLessThan(dropCategory);
+    expect(dropMerchant).toBeLessThan(dropCategory);
   });
 
   it("amount weight contribution alone = FIELD_WEIGHTS.amount when amount confidence is 1.0", () => {
@@ -300,7 +303,6 @@ describe("composeConfidence() — breakdown completeness", () => {
     const { breakdown } = composeConfidence(PERFECT);
     expect(breakdown).toHaveProperty("weightedAmount");
     expect(breakdown).toHaveProperty("weightedMerchant");
-    expect(breakdown).toHaveProperty("weightedDate");
     expect(breakdown).toHaveProperty("weightedCategory");
     expect(breakdown).toHaveProperty("rawWeightedScore");
     expect(breakdown).toHaveProperty("totalPenalty");

@@ -10,13 +10,6 @@ import { selectAmountCandidate } from "./amount.selector.js";
 import { computeAmountConfidence } from "./amount.confidence.js";
 import { DEFAULT_CURRENCY } from "./amount.constants.js";
 import type { AmountResult } from "../../../types/extractor.types.js";
-import {
-  PATTERN_ISO_DATE,
-  PATTERN_LAST_WEEKDAY,
-  PATTERN_NAMED_MONTH_DATE,
-  PATTERN_SIMPLE_RELATIVE,
-  PATTERN_US_DATE,
-} from "../dates/date.patterns.js";
 
 /**
  * Deduplicate candidates that resolved to the same numeric value.
@@ -57,29 +50,18 @@ function deduplicateByValue(candidates: AmountCandidate[]): AmountCandidate[] {
  * @param normalizedInput - output of normalizeInput().normalized, never raw user input
  */
 
-export function stripDateExpressions(input: string): string {
-  return input
-    .replace(PATTERN_ISO_DATE, " ")
-    .replace(PATTERN_US_DATE, " ")
-    .replace(PATTERN_NAMED_MONTH_DATE, " ")
-    .replace(PATTERN_SIMPLE_RELATIVE, " ")
-    .replace(PATTERN_LAST_WEEKDAY, " ");
-}
-
 export function extractAmount(normalizedInput: string): AmountResult {
   // ── Step 1: run all scanners ────────────────────────────────────────────────
   // Paired scanners run first so they populate the candidate pool before bare numbers.
   // Order does not affect correctness (dedup + select handle priority) but
   // starting with paired scanners keeps the pool cleaner before dedup.
 
-  const bareSafeInput = stripDateExpressions(normalizedInput);
-
   const allCandidates: AmountCandidate[] = [
     ...scanCurrencyPrefix(normalizedInput),
     ...scanCurrencySuffix(normalizedInput),
     ...scanNumberThenCurrency(normalizedInput),
     ...scanCurrencyThenNumber(normalizedInput),
-    ...scanBareNumbers(bareSafeInput),
+    ...scanBareNumbers(normalizedInput),
   ];
 
   // ── Step 2: deduplicate ─────────────────────────────────────────────────────

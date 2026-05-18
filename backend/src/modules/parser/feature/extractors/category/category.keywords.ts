@@ -2,30 +2,13 @@ import type { Category } from "../../../constants/parser.constants.js";
 
 /**
  * One keyword entry: a token to scan for and the category it signals.
- *
- * Keywords must be lowercase — they are matched against normalized input.
- * More-specific keywords should appear before generic ones in the array
- * (within the same category) to assist debugging, though match order
- * does not affect the result because ALL matches are collected first.
  */
-interface KeywordEntry {
+export interface KeywordEntry {
   keyword: string;
   category: Category;
+  wholeWord?: boolean; // Added to prevent substring false positives
 }
 
-/**
- * The keyword map.
- *
- * Extension guide:
- *   - Add entries to the relevant category block, or create a new block.
- *   - Keep keywords lowercase.
- *   - Prefer specific tokens ("electricity") over vague ones ("bill")
- *     to reduce false-positive risk.
- *   - Document any known false-positive risk in a comment above the entry.
- *
- * Grouping by category in source is cosmetic — the resolver iterates
- * the flat array and collects all matches.
- */
 export const KEYWORD_MAP: readonly KeywordEntry[] = [
   // ── Food & Drink ──────────────────────────────────────────────────────────
   { keyword: "coffee", category: "FOOD_DRINK" },
@@ -39,15 +22,15 @@ export const KEYWORD_MAP: readonly KeywordEntry[] = [
   { keyword: "pizza", category: "FOOD_DRINK" },
   { keyword: "burger", category: "FOOD_DRINK" },
   { keyword: "sushi", category: "FOOD_DRINK" },
-  { keyword: "bar", category: "FOOD_DRINK" }, // risk: "bar" can appear in other contexts
+  { keyword: "bar", category: "FOOD_DRINK", wholeWord: true },
 
   // ── Transportation ────────────────────────────────────────────────────────
   { keyword: "taxi", category: "TRANSPORTATION" },
-  { keyword: "bus", category: "TRANSPORTATION" },
+  { keyword: "bus", category: "TRANSPORTATION", wholeWord: true },
   { keyword: "train", category: "TRANSPORTATION" },
   { keyword: "metro", category: "TRANSPORTATION" },
   { keyword: "parking", category: "TRANSPORTATION" },
-  { keyword: "gas", category: "TRANSPORTATION" }, // risk: "gas" could be utilities
+  { keyword: "gas", category: "TRANSPORTATION", wholeWord: true },
   { keyword: "fuel", category: "TRANSPORTATION" },
   { keyword: "toll", category: "TRANSPORTATION" },
 
@@ -57,7 +40,7 @@ export const KEYWORD_MAP: readonly KeywordEntry[] = [
   { keyword: "hotel", category: "TRAVEL" },
   { keyword: "airbnb", category: "TRAVEL" },
   { keyword: "hostel", category: "TRAVEL" },
-  { keyword: "visa", category: "TRAVEL" }, // risk: "visa" could be a payment card
+  { keyword: "visa", category: "TRAVEL", wholeWord: true },
 
   // ── Groceries ─────────────────────────────────────────────────────────────
   { keyword: "groceries", category: "GROCERIES" },
@@ -69,7 +52,7 @@ export const KEYWORD_MAP: readonly KeywordEntry[] = [
   { keyword: "subscription", category: "SUBSCRIPTIONS" },
   { keyword: "premium", category: "SUBSCRIPTIONS" },
   { keyword: "membership", category: "SUBSCRIPTIONS" },
-  { keyword: "plan", category: "SUBSCRIPTIONS" },
+  { keyword: "plan", category: "SUBSCRIPTIONS", wholeWord: true },
 
   // ── Entertainment ─────────────────────────────────────────────────────────
   { keyword: "movie", category: "ENTERTAINMENT" },
@@ -96,7 +79,6 @@ export const KEYWORD_MAP: readonly KeywordEntry[] = [
   { keyword: "gym", category: "HEALTH" },
 
   // ── Utilities ─────────────────────────────────────────────────────────────
-  // Note: "bill" alone is intentionally excluded — too generic.
   { keyword: "electricity", category: "UTILITIES" },
   { keyword: "electric", category: "UTILITIES" },
   { keyword: "water bill", category: "UTILITIES" },

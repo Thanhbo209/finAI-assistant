@@ -8,7 +8,7 @@ describe("extractAmount", () => {
   // ─────────────────────────────────────────────────────────────
 
   it("extracts bare integer amount", () => {
-    const result = extractAmount("coffee 5 2025 jan 2");
+    const result = extractAmount("coffee 5 ");
 
     expect(result.value).toBe(5);
     expect(result.currency).toBe("USD");

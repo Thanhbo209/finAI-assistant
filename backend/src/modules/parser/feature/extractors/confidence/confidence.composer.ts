@@ -13,10 +13,7 @@ import type {
 const EXPECTED_WEIGHT_SUM = 1.0;
 const WEIGHT_SUM_TOLERANCE = 0.0001;
 const actualWeightSum =
-  FIELD_WEIGHTS.amount +
-  FIELD_WEIGHTS.merchant +
-  FIELD_WEIGHTS.date +
-  FIELD_WEIGHTS.category;
+  FIELD_WEIGHTS.amount + FIELD_WEIGHTS.merchant + FIELD_WEIGHTS.category;
 
 if (Math.abs(actualWeightSum - EXPECTED_WEIGHT_SUM) > WEIGHT_SUM_TOLERANCE) {
   throw new Error(
@@ -56,8 +53,6 @@ function computePenalties(
     penalty += MISSING_FIELD_PENALTIES.MISSING_AMOUNT;
   if (missingFields.includes("merchant"))
     penalty += MISSING_FIELD_PENALTIES.MISSING_MERCHANT;
-  if (missingFields.includes("date"))
-    penalty += MISSING_FIELD_PENALTIES.MISSING_DATE;
   if (categoryValue === "Unknown")
     penalty += MISSING_FIELD_PENALTIES.UNKNOWN_CATEGORY;
 

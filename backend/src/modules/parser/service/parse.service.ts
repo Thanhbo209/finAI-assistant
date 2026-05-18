@@ -41,7 +41,9 @@ export interface ParseTransactionOptions {
 function resolveTransactionDate(transactionDate?: Date): Date {
   const d = transactionDate ?? new Date();
 
-  return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0, 0);
+  return new Date(
+    Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), 0, 0, 0, 0),
+  );
 }
 
 export function parseTransaction(

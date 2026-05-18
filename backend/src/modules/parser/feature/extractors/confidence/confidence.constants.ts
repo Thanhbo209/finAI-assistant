@@ -23,7 +23,7 @@
 export const FIELD_WEIGHTS = {
   amount: 0.5,
   merchant: 0.35,
-  category: 0.1,
+  category: 0.15,
 } as const satisfies Record<string, number>;
 
 // Compile-time guard: weights must sum to 1.0

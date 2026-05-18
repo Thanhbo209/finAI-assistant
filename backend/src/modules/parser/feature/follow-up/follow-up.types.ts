@@ -4,7 +4,10 @@
  * All fields are optional — the generator must work without any context.
  */
 
-import type { Category, MissingField } from "../constants/parser.constants.js";
+import type {
+  Category,
+  MissingField,
+} from "../../constants/parser.constants.js";
 
 export interface FollowUpContext {
   merchantName?: string | null;

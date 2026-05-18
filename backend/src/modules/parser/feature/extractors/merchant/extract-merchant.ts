@@ -15,7 +15,7 @@
  * @param normalizedInput - post-normalization string; never raw user input
  */
 
-import type { MerchantResult } from "../../types/extractor.types.js";
+import type { MerchantResult } from "../../../types/extractor.types.js";
 import { computeMerchantConfidence } from "./merchant.confidence.js";
 import { scanMerchantCandidates } from "./merchant.scanner.js";
 import { selectMerchantCandidate } from "./merchant.selector.js";

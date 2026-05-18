@@ -12,7 +12,7 @@ import type {
   CategoryResult,
   DateResult,
   MerchantResult,
-} from "../../types/extractor.types.js";
+} from "../../../types/extractor.types.js";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Test fixtures — build realistic extractor outputs without running the pipeline

@@ -67,6 +67,10 @@ export const CATEGORY_DISPLAY_NAMES: Record<Category, string> = {
 
 export type Category = (typeof CATEGORY)[keyof typeof CATEGORY];
 
+// parser.constants.ts
+export type CategoryDisplayName =
+  (typeof CATEGORY_DISPLAY_NAMES)[keyof typeof CATEGORY_DISPLAY_NAMES];
+
 /**
  * Named missing-field identifiers — never use raw strings at call sites.
  * Standardized missing-data tracking.

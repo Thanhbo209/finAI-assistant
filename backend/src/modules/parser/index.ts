@@ -1,7 +1,7 @@
 // Normalization
 
-export { normalizeInput } from "./normalization/normalize.input.js";
-export type { NormalizationResult } from "./normalization/normalize.types.js";
+export { normalizeInput } from "./feature/normalization/normalize.input.js";
+export type { NormalizationResult } from "./feature/normalization/normalize.types.js";
 
 // Types
 
@@ -24,6 +24,6 @@ export {
 } from "./constants/parser.constants.js";
 export type { Category, MissingField } from "./constants/parser.constants.js";
 
-export { extractAmount } from "./extractors/amount/extract-amount.js";
-export type { AmountCandidate } from "./extractors/amount/amount.types.js";
-export { MULTI_NUMBER_STRATEGY } from "./extractors/amount/amount.constants.js";
+export { extractAmount } from "./feature/extractors/amount/extract-amount.js";
+export type { AmountCandidate } from "./feature/extractors/amount/amount.types.js";
+export { MULTI_NUMBER_STRATEGY } from "./feature/extractors/amount/amount.constants.js";

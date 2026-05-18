@@ -127,7 +127,9 @@ export function scanBareNumbers(input: string): AmountCandidate[] {
     if (rawNumber === undefined) {
       continue;
     }
+
     const value = parseFloat(rawNumber);
+
     candidates.push({
       value,
       currency: DEFAULT_CURRENCY,

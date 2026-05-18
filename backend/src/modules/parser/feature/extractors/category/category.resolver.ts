@@ -1,5 +1,8 @@
-import { CATEGORY, type Category } from "../../constants/parser.constants.js";
-import type { CategoryResult } from "../../types/extractor.types.js";
+import {
+  CATEGORY,
+  type Category,
+} from "../../../constants/parser.constants.js";
+import type { CategoryResult } from "../../../types/extractor.types.js";
 import { MERCHANT_DICTIONARY } from "../merchant/merchant.dictionary.js";
 import {
   CATEGORY_CONFIDENCE,

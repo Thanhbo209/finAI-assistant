@@ -5,13 +5,13 @@
 import {
   MISSING_FIELD,
   type MissingField,
-} from "../../constants/parser.constants.js";
+} from "../../../constants/parser.constants.js";
 import type {
   AmountResult,
   CategoryResult,
   DateResult,
   MerchantResult,
-} from "../../types/extractor.types.js";
+} from "../../../types/extractor.types.js";
 import {
   DEFAULT_DATE_IS_MISSING,
   MIN_CONFIDENCE,
@@ -74,7 +74,7 @@ export function isMerchantMissing(result: MerchantResult): boolean {
 export function isCategoryMissing(result: CategoryResult): boolean {
   if (!UNKNOWN_CATEGORY_IS_MISSING) return false;
 
-  return result.value === "Unknown";
+  return result.value === "UNKNOWN";
 }
 
 /**
@@ -93,14 +93,12 @@ export function detectMissingFields({
   amountResult,
   merchantResult,
   categoryResult,
-  dateResult,
 }: DetectMissingFieldsInput): MissingField[] {
   const missing: MissingField[] = [];
 
   if (isAmountMissing(amountResult)) missing.push(MISSING_FIELD.AMOUNT);
   if (isMerchantMissing(merchantResult)) missing.push(MISSING_FIELD.MERCHANT);
   if (isCategoryMissing(categoryResult)) missing.push(MISSING_FIELD.CATEGORY);
-  if (isDateMissing(dateResult)) missing.push(MISSING_FIELD.DATE);
 
   return missing;
 }

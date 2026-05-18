@@ -9,7 +9,7 @@
  *   category — almost never worth asking; handled by SUPPRESS_CATEGORY_QUESTION
  */
 
-import type { MissingField } from "../constants/parser.constants.js";
+import type { MissingField } from "../../constants/parser.constants.js";
 
 export const MISSING_FIELD_PRIORITY: ReadonlyArray<MissingField> = [
   "amount",

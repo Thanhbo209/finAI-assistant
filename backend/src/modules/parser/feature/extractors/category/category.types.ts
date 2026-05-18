@@ -1,4 +1,4 @@
-import type { MerchantResult } from "../../types/extractor.types.js";
+import type { MerchantResult } from "../../../types/extractor.types.js";
 
 /**
  * Input contract for the category resolver.

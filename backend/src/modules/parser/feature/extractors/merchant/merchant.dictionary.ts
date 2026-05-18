@@ -10,7 +10,7 @@
  * lookup rather than a second scan.  The category resolver may override it.
  */
 
-import type { Category } from "../../constants/parser.constants.js";
+import type { Category } from "../../../constants/parser.constants.js";
 
 export interface MerchantEntry {
   /** Display name stored in the DB, e.g. "McDonald's" */
@@ -40,52 +40,52 @@ export const MERCHANT_DICTIONARY: readonly MerchantEntry[] = [
   {
     canonicalName: "Uber",
     aliases: ["uber eats", "uber trip", "uber"],
-    defaultCategory: "Transportation",
+    defaultCategory: "TRANSPORTATION",
   },
   {
     canonicalName: "Grab",
     aliases: ["grabfood", "grab food", "grab car", "grab"],
-    defaultCategory: "Transportation",
+    defaultCategory: "TRANSPORTATION",
   },
   {
     canonicalName: "Netflix",
     aliases: ["netflix"],
-    defaultCategory: "Subscriptions",
+    defaultCategory: "SUBSCRIPTIONS",
   },
   {
     canonicalName: "Spotify",
     aliases: ["spotify premium", "spotify"],
-    defaultCategory: "Subscriptions",
+    defaultCategory: "SUBSCRIPTIONS",
   },
   {
     canonicalName: "Amazon",
     aliases: ["amazon prime", "amazon"],
-    defaultCategory: "Shopping",
+    defaultCategory: "SHOPPING",
   },
   {
     canonicalName: "Starbucks",
     aliases: ["starbucks coffee", "starbucks"],
-    defaultCategory: "Food & Drink",
+    defaultCategory: "FOOD_DRINK",
   },
   {
     canonicalName: "McDonald's",
     aliases: ["mcdonalds", "mcdonald", "mcd"],
-    defaultCategory: "Food & Drink",
+    defaultCategory: "FOOD_DRINK",
   },
   {
     canonicalName: "Walmart",
     aliases: ["walmart grocery", "walmart groceries", "walmart"],
-    defaultCategory: "Groceries",
+    defaultCategory: "GROCERIES",
   },
   {
     canonicalName: "Apple",
     aliases: ["apple music", "apple tv", "apple store", "apple"],
-    defaultCategory: "Subscriptions",
+    defaultCategory: "SUBSCRIPTIONS",
   },
   {
     canonicalName: "Google",
     aliases: ["google play", "google one", "google"],
-    defaultCategory: "Subscriptions",
+    defaultCategory: "SUBSCRIPTIONS",
   },
 ] as const;
 

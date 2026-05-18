@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { normalizeInput } from "../modules/parser/normalization/normalize.input.js";
+import { normalizeInput } from "../modules/parser/feature/normalization/normalize.input.js";
 import {
   collapseWhitespace,
   lowercaseInput,
@@ -7,7 +7,7 @@ import {
   normalizeUnicodeWhitespace,
   removeNoisePunctuation,
   replaceWordSeparators,
-} from "../modules/parser/normalization/normalize.steps.js";
+} from "../modules/parser/feature/normalization/normalize.steps.js";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Full pipeline — spec examples

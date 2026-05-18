@@ -52,7 +52,7 @@ export const CATEGORY = {
   UNKNOWN: "UNKNOWN",
 } as const;
 
-export const CATEGORY_DISPLAY_NAMES: Record<Category, string> = {
+export const CATEGORY_DISPLAY_NAMES = {
   FOOD_DRINK: "Food & Drink",
   TRANSPORTATION: "Transportation",
   GROCERIES: "Groceries",
@@ -63,9 +63,13 @@ export const CATEGORY_DISPLAY_NAMES: Record<Category, string> = {
   UTILITIES: "Utilities",
   TRAVEL: "Travel",
   UNKNOWN: "Unknown",
-} as const;
+} as const satisfies Record<Category, string>;
 
 export type Category = (typeof CATEGORY)[keyof typeof CATEGORY];
+
+// parser.constants.ts
+export type CategoryDisplayName =
+  (typeof CATEGORY_DISPLAY_NAMES)[keyof typeof CATEGORY_DISPLAY_NAMES];
 
 /**
  * Named missing-field identifiers — never use raw strings at call sites.

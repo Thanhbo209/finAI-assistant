@@ -1,4 +1,8 @@
-import type { Category, MissingField } from "../constants/parser.constants.js";
+import type {
+  Category,
+  CategoryDisplayName,
+  MissingField,
+} from "../constants/parser.constants.js";
 
 /**
  * The complete, typed output of the parser pipeline.
@@ -11,8 +15,8 @@ export interface ParseResult {
   amount: number | null;
   currency: string;
   merchantName: string | null;
-  category: Category;
-  transactionDate: Date | null;
+  category: CategoryDisplayName;
+  transactionDate: Date;
 
   // ── Input representation ──────────────────────────────────────────
   /** Exactly what the user typed — stored verbatim in DB */

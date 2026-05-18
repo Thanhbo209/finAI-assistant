@@ -1,4 +1,4 @@
-import type { MissingField } from "../constants/parser.constants.js";
+import type { MissingField } from "../../constants/parser.constants.js";
 import {
   MISSING_FIELD_PRIORITY,
   MAX_COMBINED_FIELDS,
@@ -95,7 +95,6 @@ function combineTwoQuestions(first: string, second: string): string {
  *   5. If >2 fields remain → combined question for top 2 only
  *      (asking about all fields at once is a form, not a conversation)
  *
- * Pure function — no DB, no API, no side effects.
  */
 
 export function generateFollowUp(input: GeneratorFollowUpInput): string | null {

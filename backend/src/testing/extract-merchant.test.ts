@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { extractMerchant } from "../modules/parser/extractors/merchant/extract-merchant.js";
-import { MERCHANT_CONFIDENCE } from "../modules/parser/extractors/merchant/merchant.constants.js";
+import { extractMerchant } from "../modules/parser/feature/extractors/merchant/extract-merchant.js";
+import { MERCHANT_CONFIDENCE } from "../modules/parser/feature/extractors/merchant/merchant.constants.js";
 import {
   scanExactAliases,
   scanMerchantCandidates,
   scanPartialTokens,
-} from "../modules/parser/extractors/merchant/merchant.scanner.js";
-import { selectMerchantCandidate } from "../modules/parser/extractors/merchant/merchant.selector.js";
-import { computeMerchantConfidence } from "../modules/parser/extractors/merchant/merchant.confidence.js";
+} from "../modules/parser/feature/extractors/merchant/merchant.scanner.js";
+import { selectMerchantCandidate } from "../modules/parser/feature/extractors/merchant/merchant.selector.js";
+import { computeMerchantConfidence } from "../modules/parser/feature/extractors/merchant/merchant.confidence.js";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Spec-required test cases — extractMerchant()

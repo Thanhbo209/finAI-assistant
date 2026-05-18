@@ -1,5 +1,8 @@
-import { CATEGORY, type Category } from "../../constants/parser.constants.js";
-import type { CategoryResult } from "../../types/extractor.types.js";
+import {
+  CATEGORY,
+  type Category,
+} from "../../../constants/parser.constants.js";
+import type { CategoryResult } from "../../../types/extractor.types.js";
 import { MERCHANT_DICTIONARY } from "../merchant/merchant.dictionary.js";
 import {
   CATEGORY_CONFIDENCE,
@@ -61,8 +64,21 @@ function resolveFromKeywords(normalizedInput: string): CategoryResult | null {
   // Collect all matching keywords grouped by category
   const categoryHits = new Map<Category, number>();
 
-  for (const { keyword, category } of KEYWORD_MAP) {
-    if (normalizedInput.includes(keyword)) {
+  for (const { keyword, category, wholeWord } of KEYWORD_MAP) {
+    let isMatch = false;
+
+    if (wholeWord) {
+      // Use word boundaries to prevent substring matches (e.g., "bus" in "business")
+      // Escaping prevents regex injection if a keyword ever contains special characters
+      const escapedKeyword = keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const regex = new RegExp(`\\b${escapedKeyword}\\b`, "i");
+      isMatch = regex.test(normalizedInput);
+    } else {
+      // Fallback to fast substring matching for standard keywords
+      isMatch = normalizedInput.includes(keyword);
+    }
+
+    if (isMatch) {
       categoryHits.set(category, (categoryHits.get(category) ?? 0) + 1);
     }
   }

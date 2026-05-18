@@ -1,3 +1,6 @@
+import { MULTI_NUMBER_STRATEGY } from "./amount.constants.js";
+import type { AmountCandidate } from "./amount.types.js";
+
 /**
  * Select one candidate from the found set.
  *
@@ -16,9 +19,6 @@
  *   "uber 45 airport 10" → $10 (last figure).
  *   This is documented in amount.constants.ts and tested explicitly.
  */
-
-import { MULTI_NUMBER_STRATEGY } from "./amount.constants.js";
-import type { AmountCandidate } from "./amount.types.js";
 
 export function selectAmountCandidate(
   candidates: AmountCandidate[],

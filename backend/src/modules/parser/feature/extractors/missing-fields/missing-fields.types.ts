@@ -3,7 +3,7 @@ import type {
   MerchantResult,
   CategoryResult,
   DateResult,
-} from "../../types/extractor.types.js";
+} from "../../../types/extractor.types.js";
 
 /**
  * The inputs to the missing-field detector.
@@ -14,5 +14,4 @@ export interface DetectMissingFieldsInput {
   amountResult: AmountResult;
   merchantResult: MerchantResult;
   categoryResult: CategoryResult;
-  dateResult: DateResult;
 }

@@ -42,7 +42,7 @@ export const middleware = (req: Request, res: Response, next: NextFunction) => {
       process.env.JWT_ACCESS_SECRET!,
     ) as JwtPayload;
 
-    if (!decoded.sub) {
+    if (!decoded.sub || !decoded.role) {
       return res.status(401).json({ message: "Invalid token payload" });
     }
 

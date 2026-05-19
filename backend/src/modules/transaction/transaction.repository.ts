@@ -76,14 +76,19 @@ export class TransactionRepository {
     transactionId: string,
     data: Prisma.TransactionUpdateInput,
   ): Promise<Transaction> {
-    return prisma.transaction.update({
+    const result = await prisma.transaction.updateMany({
       where: {
-        id_userId: {
-          id: transactionId,
-          userId,
-        },
+        id: transactionId,
+        userId,
+        deletedAt: null,
       },
       data,
+    });
+    if (result.count === 0) {
+      throw new Error("Transaction not found or already deleted");
+    }
+    return prisma.transaction.findFirstOrThrow({
+      where: { id: transactionId, userId, deletedAt: null },
     });
   }
 
@@ -91,16 +96,20 @@ export class TransactionRepository {
     userId: string,
     transactionId: string,
   ): Promise<Transaction> {
-    return prisma.transaction.update({
+    const now = new Date();
+    const result = await prisma.transaction.updateMany({
       where: {
-        id_userId: {
-          id: transactionId,
-          userId,
-        },
+        id: transactionId,
+        userId,
+        deletedAt: null,
       },
-      data: {
-        deletedAt: new Date(),
-      },
+      data: { deletedAt: now },
+    });
+    if (result.count === 0) {
+      throw new Error("Transaction not found or already deleted");
+    }
+    return prisma.transaction.findFirstOrThrow({
+      where: { id: transactionId, userId },
     });
   }
 

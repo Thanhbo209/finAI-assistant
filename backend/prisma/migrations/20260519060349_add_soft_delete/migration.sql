@@ -2,6 +2,9 @@
 CREATE TYPE "UserRole" AS ENUM ('USER', 'ADMIN');
 
 -- CreateEnum
+CREATE TYPE "TransactionCategory" AS ENUM ('FOOD_DRINK', 'TRANSPORTATION', 'GROCERIES', 'SUBSCRIPTIONS', 'ENTERTAINMENT', 'SHOPPING', 'HEALTH', 'UTILITIES', 'TRAVEL', 'UNKNOWN');
+
+-- CreateEnum
 CREATE TYPE "TransactionStatus" AS ENUM ('PENDING', 'PROCESSING', 'COMPLETED', 'FAILED');
 
 -- CreateTable
@@ -30,9 +33,10 @@ CREATE TABLE "transactions" (
     "descriptionRaw" TEXT NOT NULL,
     "descriptionNormalized" TEXT,
     "merchantName" TEXT,
-    "category" TEXT,
+    "category" "TransactionCategory" NOT NULL DEFAULT 'UNKNOWN',
     "transactionDate" TIMESTAMP(3) NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "deletedAt" TIMESTAMP(3),
 
     CONSTRAINT "transactions_pkey" PRIMARY KEY ("id")
 );

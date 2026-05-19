@@ -1,10 +1,15 @@
 import type { NextFunction, Response, Request } from "express";
 import jwt from "jsonwebtoken";
 
+type AuthUser = {
+  userId: string;
+  role: string;
+};
+
 declare global {
   namespace Express {
     interface Request {
-      user?: JwtPayload;
+      user?: AuthUser;
     }
   }
 }
@@ -35,9 +40,16 @@ export const middleware = (req: Request, res: Response, next: NextFunction) => {
     const decoded = jwt.verify(
       token,
       process.env.JWT_ACCESS_SECRET!,
-    ) as unknown as JwtPayload;
+    ) as JwtPayload;
 
-    req.user = decoded;
+    if (!decoded.sub) {
+      return res.status(401).json({ message: "Invalid token payload" });
+    }
+
+    req.user = {
+      userId: decoded.sub,
+      role: decoded.role,
+    };
 
     next();
   } catch {

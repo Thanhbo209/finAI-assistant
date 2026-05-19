@@ -36,7 +36,7 @@ export const register = async ({ email, password }: RegisterBody) => {
 export const login = async ({ email, password }: LoginBody) => {
   const user = await authRepository.findUserByEmail(email);
   if (!user) {
-    throw new AppError(400, "BAD_REQUEST", "Invalid credentials");
+    throw new AppError(401, "UNAUTHORIZED", "Invalid credentials");
   }
   const isPasswordValid = await comparePassword(password, user.passwordHash);
 

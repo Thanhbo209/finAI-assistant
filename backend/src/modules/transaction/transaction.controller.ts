@@ -65,7 +65,7 @@ export class TransactionController {
 
     return res.status(200).json({
       success: true,
-      ...result,
+      data: result,
     });
   }
 

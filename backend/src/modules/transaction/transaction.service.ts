@@ -58,7 +58,7 @@ export class TransactionService {
       currency: finalValues.currency,
       merchantName: finalValues.merchantName,
       category: finalValues.category,
-      transactionDate: new Date(`${finalValues.transactionDate}T00:00:00.000Z`),
+      transactionDate: this.toStartOfDay(finalValues.transactionDate),
 
       // Parser metadata
       confidenceScore: parserResult.confidenceScore,
@@ -266,11 +266,11 @@ export class TransactionService {
     };
 
     if (query.dateFrom) {
-      filters.dateFrom = new Date(query.dateFrom);
+      filters.dateFrom = this.toStartOfDay(query.dateFrom);
     }
 
     if (query.dateTo) {
-      filters.dateTo = new Date(query.dateTo);
+      filters.dateTo = this.toEndOfDay(query.dateTo);
     }
     const result = await transactionRepository.categorySummary(userId, filters);
 
@@ -299,11 +299,11 @@ export class TransactionService {
     };
 
     if (query.dateFrom) {
-      filters.dateFrom = new Date(query.dateFrom);
+      filters.dateFrom = this.toStartOfDay(query.dateFrom);
     }
 
     if (query.dateTo) {
-      filters.dateTo = new Date(query.dateTo);
+      filters.dateTo = this.toEndOfDay(query.dateTo);
     }
     const result = await transactionRepository.merchantSummary(
       userId,

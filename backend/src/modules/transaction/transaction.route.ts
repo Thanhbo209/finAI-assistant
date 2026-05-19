@@ -6,7 +6,11 @@ import { middleware } from "../../common/middleware/auth.middleware.js";
 export const transactionRouter = Router();
 
 // parser
-transactionRouter.post("/parse", transactionController.parseTransaction);
+transactionRouter.post(
+  "/parse",
+  middleware,
+  transactionController.parseTransaction,
+);
 
 // analytics
 transactionRouter.get(

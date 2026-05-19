@@ -48,7 +48,7 @@ export const getMe = async (
   next: NextFunction,
 ) => {
   try {
-    const userId = req.user!.sub;
+    const userId = req.user!.userId;
     const result = await authService.getMe(userId);
 
     return res.status(200).json({

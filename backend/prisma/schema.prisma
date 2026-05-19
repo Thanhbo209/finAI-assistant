@@ -120,10 +120,12 @@ model Transaction {
 
   transactionDate DateTime
 
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
+  deletedAt DateTime?
 
   user User @relation(fields: [userId], references: [id])
 
+  @@unique([id, userId])
   @@index([userId, transactionDate(sort: Desc)])
   @@index([merchantName])
   @@map("transactions")

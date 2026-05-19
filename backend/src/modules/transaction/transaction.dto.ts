@@ -36,10 +36,10 @@ const ParserResultSchema = z.object({
   amount: z.number().nullable(),
   currency: z.string().default("USD"), // Default to USD if not provided
   merchantName: z.string().nullable(),
-  category: CategoryEnum,
+  category: CategoryEnum.nullable(),
   confidenceScore: Confidence,
   missingFields: z.array(z.string()),
-  followUpQuestion: z.string().optional(),
+  followUpQuestion: z.string().nullable().optional(),
   parserVersion: z.string(),
   aiProcessed: z.boolean(),
   descriptionRaw: z.string(),

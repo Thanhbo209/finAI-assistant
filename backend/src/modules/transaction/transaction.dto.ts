@@ -11,7 +11,27 @@ const CategoryEnum = z.nativeEnum(TransactionCategory);
 const IsoDateString = z
   .string()
   .regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be YYYY-MM-DD")
-  .refine((s) => !isNaN(new Date(s).getTime()), "Invalid date value");
+  .refine((s) => {
+    const parts = s.split("-");
+
+    if (parts.length !== 3) return false;
+
+    const y = Number(parts[0]);
+    const m = Number(parts[1]);
+    const d = Number(parts[2]);
+
+    if (!Number.isInteger(y) || !Number.isInteger(m) || !Number.isInteger(d)) {
+      return false;
+    }
+
+    const dt = new Date(Date.UTC(y, m - 1, d));
+
+    return (
+      dt.getUTCFullYear() === y &&
+      dt.getUTCMonth() === m - 1 &&
+      dt.getUTCDate() === d
+    );
+  }, "Invalid date value");
 
 const PositiveDecimal = z
   .number()

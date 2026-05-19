@@ -56,7 +56,7 @@ export const login = async ({ email, password }: LoginBody) => {
 export const getMe = async (userId: string) => {
   const user = await authRepository.findUserById(userId);
   if (!user) {
-    throw new AppError(400, "BAD_REQUEST", "User not found");
+    throw new AppError(404, "NOT_FOUND", "User not found");
   }
 
   return {

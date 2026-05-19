@@ -15,28 +15,25 @@ export interface ParserOutPut {
   category: string | null;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
 // API-layer transaction shape (what the service returns, not the raw DB row)
-// ─────────────────────────────────────────────────────────────────────────────
 
 export interface TransactionRecord {
   id: string;
   userId: string;
   amount: number;
   currency: string;
-  merchantName: string;
+  merchantName: string | null;
   category: string;
   transactionDate: string;
   notes: string | null;
   parserMetadata: ParseMetadata;
   parserOutput: ParserOutPut;
   createdAt: string;
-  updatedAt: string;
+  // add only if model persists it
+  // updatedAt?: string;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
 // Parser module result (returned from parseTransaction())
-// ─────────────────────────────────────────────────────────────────────────────
 export interface ParseResult {
   amount: number | null;
   currency: string | null;

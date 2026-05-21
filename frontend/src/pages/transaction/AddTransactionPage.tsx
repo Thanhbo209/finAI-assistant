@@ -15,7 +15,7 @@ export default function AddTransactionPage() {
     handleFollowUpAnswer,
     handleFollowUpSkip,
     handleConfirm,
-    handleEdit,
+    handleUpdatePreviewOverrides,
     handleReset,
     sessionCurrency,
   } = useChatOrchestrator();
@@ -71,7 +71,7 @@ export default function AddTransactionPage() {
           messages={messages}
           isSaving={isSaving}
           onConfirm={() => void handleConfirm()}
-          onEdit={handleEdit}
+          onUpdatePreviewOverrides={handleUpdatePreviewOverrides}
         />
 
         <AnimatePresence>

@@ -21,6 +21,9 @@ import {
   buildMonthlyDisplaySummary,
   withDisplayAmount,
 } from "./transaction-display.js";
+import { merchantService } from "../merchants/merchant.service.js";
+import { personalizationService } from "../personalization/personalization.service.js";
+import { aiAssistanceService } from "../ai-assistance/ai-assistance.service.js";
 
 export class TransactionService {
   private toStartOfDay(date: string): Date {
@@ -31,6 +34,7 @@ export class TransactionService {
     return new Date(`${date}T23:59:59.999Z`);
   }
   async parseTransactionInput(
+    userId: string,
     input: string,
     currencyContext?: CurrencyContext,
   ) {
@@ -38,18 +42,51 @@ export class TransactionService {
       ...(currencyContext !== undefined && { currencyContext }),
     });
 
+    const personalized = await personalizationService.resolveForParser({
+      userId,
+      merchantName: parsed.merchantName,
+      normalizedInput: parsed.descriptionNormalized,
+      parserCategory: parsed.category,
+      parserConfidence: parsed.confidenceScore,
+    });
+
+    const aiSuggestion = await aiAssistanceService.suggestWithRetry({
+      userId,
+      normalizedInput: parsed.descriptionNormalized,
+      parserMerchantName: parsed.merchantName,
+      parserCategory: parsed.category,
+      parserConfidence: parsed.confidenceScore,
+      missingFields: parsed.missingFields,
+    });
+
+    const categorySuggestion = personalized.categorySuggestion;
+    const category = categorySuggestion?.category ?? aiSuggestion?.category ?? parsed.category;
+    const merchantName =
+      personalized.merchantName ?? aiSuggestion?.merchantName ?? parsed.merchantName;
+    const confidenceBoost = categorySuggestion ? 0.08 : aiSuggestion ? 0.04 : 0;
+    const missingFields = parsed.missingFields.filter((field) => {
+      if (field === "merchant" && merchantName) return false;
+      if (field === "category" && category) return false;
+      return true;
+    });
+
     return {
       amount: parsed.amount,
       currency: parsed.currency,
-      merchantName: parsed.merchantName,
-      category: parsed.category,
-      confidenceScore: parsed.confidenceScore,
-      missingFields: parsed.missingFields,
+      merchantName,
+      category,
+      confidenceScore: Math.min(1, parsed.confidenceScore + confidenceBoost),
+      missingFields,
       followUpQuestions: parsed.followUpQuestion,
       parserVersion: parsed.parserVersion,
-      aiProcessed: parsed.aiProcessed,
+      aiProcessed: parsed.aiProcessed || aiSuggestion !== null,
       descriptionRaw: parsed.descriptionRaw,
       descriptionNormalized: parsed.descriptionNormalized,
+      intelligence: {
+        merchantId: personalized.merchantId,
+        categorySuggestion,
+        aiSuggestion,
+      },
     };
   }
 
@@ -58,6 +95,10 @@ export class TransactionService {
     dto: CreateTransactionDTO,
   ): Promise<Transaction> {
     const { parserResult, finalValues } = dto;
+    const merchant = await merchantService.resolveMerchant(
+      finalValues.merchantName ?? parserResult.merchantName,
+    );
+    const merchantId = merchant.source === "NONE" ? null : merchant.merchantId;
 
     const transaction = await transactionRepository.create({
       user: {
@@ -65,11 +106,12 @@ export class TransactionService {
           id: userId,
         },
       },
+      ...(merchantId ? { merchant: { connect: { id: merchantId } } } : {}),
 
       // Final user-confirmed values
       amount: finalValues.amount,
       currency: finalValues.currency,
-      merchantName: finalValues.merchantName,
+      merchantName: merchantId ? merchant.canonicalName : finalValues.merchantName,
       category: finalValues.category,
       transactionDate: this.toStartOfDay(finalValues.transactionDate),
 
@@ -79,6 +121,11 @@ export class TransactionService {
       parserVersion: parserResult.parserVersion,
       descriptionRaw: parserResult.descriptionRaw,
       descriptionNormalized: parserResult.descriptionNormalized,
+      parserAmount: parserResult.amount,
+      parserCurrency: parserResult.currency,
+      parserMerchantName: parserResult.merchantName,
+      parserCategory: parserResult.category,
+      parserMissingFields: parserResult.missingFields,
 
       // System fields
       processingStatus: "COMPLETED",
@@ -86,6 +133,12 @@ export class TransactionService {
 
       // optional source classification
       sourceType: "AI_PARSER",
+    });
+
+    await personalizationService.learnFromConfirmation({
+      userId,
+      transaction,
+      dto,
     });
 
     return transaction;
@@ -221,7 +274,17 @@ export class TransactionService {
     }
 
     if (dto.merchantName !== undefined) {
-      updateData.merchantName = dto.merchantName;
+      if (dto.merchantName === null) {
+        updateData.merchantName = null;
+        updateData.merchant = { disconnect: true };
+      } else {
+        const merchant = await merchantService.resolveMerchant(dto.merchantName);
+        updateData.merchantName =
+          merchant.source === "NONE" ? dto.merchantName : merchant.canonicalName;
+        if (merchant.source !== "NONE") {
+          updateData.merchant = { connect: { id: merchant.merchantId } };
+        }
+      }
     }
 
     if (dto.category !== undefined) {
@@ -232,7 +295,20 @@ export class TransactionService {
       updateData.transactionDate = this.toStartOfDay(dto.transactionDate);
     }
 
-    return transactionRepository.update(userId, transactionId, updateData);
+    const updated = await transactionRepository.update(
+      userId,
+      transactionId,
+      updateData,
+    );
+
+    await personalizationService.learnFromTransactionUpdate({
+      userId,
+      before: existing,
+      after: updated,
+      dto,
+    });
+
+    return updated;
   }
 
   async deleteTransaction(userId: string, transactionId: string) {

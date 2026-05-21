@@ -15,8 +15,10 @@ import {
 export class TransactionController {
   async parseTransaction(req: Request, res: Response) {
     const dto = ParseInputSchema.parse(req.body);
+    const userId = req.user!.userId;
 
     const result = await transactionService.parseTransactionInput(
+      userId,
       dto.input,
       dto.currencyContext,
     );

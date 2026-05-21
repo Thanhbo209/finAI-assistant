@@ -6,6 +6,7 @@ import DashboardPage from "@/pages/dashboard/DashboardPage";
 import AddTransactionPage from "@/pages/transaction/AddTransactionPage";
 import TransactionsPage from "@/pages/transaction/TransactionsPage";
 import SettingsPage from "@/pages/settings/SettingsPage";
+import IntelligencePage from "@/pages/intelligence/IntelligencePage";
 import CurrencyOnboardingPage from "@/pages/onboarding/CurrencyOnboardingPage";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import RegisterPage from "@/pages/auth/RegisterPage";
@@ -61,6 +62,7 @@ export default function AppRouter() {
             <Route index element={<DashboardPage />} />
             <Route path="add" element={<AddTransactionPage />} />
             <Route path="transactions" element={<TransactionsPage />} />
+            <Route path="intelligence" element={<IntelligencePage />} />
             <Route path="settings" element={<SettingsPage />} />
           </Route>
 

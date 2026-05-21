@@ -3,6 +3,7 @@ import type {
   SourceType,
   TransactionCategory,
 } from "./category";
+import type { ParseIntelligence } from "./intelligence";
 
 export interface Transaction {
   id: string;
@@ -41,6 +42,7 @@ export interface ParseResult {
   aiProcessed: boolean;
   descriptionRaw: string;
   descriptionNormalized: string;
+  intelligence?: ParseIntelligence;
 }
 
 export interface FinalTransactionValues {

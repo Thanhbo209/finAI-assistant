@@ -31,7 +31,7 @@ function CustomTooltip({ active, payload, currency }: TooltipProps) {
           className="h-2 w-2 rounded-full"
           style={{ background: d.color }}
         />
-        <span className="font-semibold text-foreground">{d.label}</span>
+        <span className="font-bold text-foreground">{d.label}</span>
       </div>
       <p className="font-bold text-foreground">
         {formatCurrency(d.value, currency)}
@@ -65,7 +65,9 @@ function LegendItem({
           className="h-2 w-2 rounded-full shrink-0"
           style={{ background: color }}
         />
-        <span className="text-muted-foreground truncate">{label}</span>
+        <span className="text-muted-foreground truncate font-bold">
+          {label}
+        </span>
       </div>
       <div className="flex items-center gap-2 shrink-0">
         <span className="font-medium text-foreground">

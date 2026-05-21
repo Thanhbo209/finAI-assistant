@@ -12,6 +12,7 @@ import {
   Sun,
   Moon,
   Settings2,
+  BrainCircuit,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useCurrency } from "@/hooks/useCurrency";
@@ -22,6 +23,7 @@ const NAV_ITEMS = [
   { to: "/dashboard", icon: LayoutDashboard, label: "Overview" },
   { to: "/dashboard/add", icon: PlusCircle, label: "Add Transaction" },
   { to: "/dashboard/transactions", icon: Receipt, label: "Transactions" },
+  { to: "/dashboard/intelligence", icon: BrainCircuit, label: "Intelligence" },
   { to: "/dashboard/settings", icon: Settings2, label: "Settings" },
 ];
 

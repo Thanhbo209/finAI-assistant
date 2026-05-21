@@ -1,6 +1,8 @@
 import { AppError } from "../../common/error/app.error.js";
 import type { Prisma, Transaction } from "../../generated/prisma/index.js";
 import { parseTransaction } from "../parser/service/parse.service.js";
+import type { CurrencyContext } from "../parser/feature/extractors/amount/amount.constants.js";
+import type { CurrencyCode } from "../../common/constants/currency.constants.js";
 import type {
   CategorySummaryQuery,
   CreateTransactionDTO,
@@ -13,6 +15,12 @@ import {
   transactionRepository,
   type SummaryDateFilter,
 } from "./transaction.repository.js";
+import {
+  buildCategoryDisplaySummary,
+  buildMerchantDisplaySummary,
+  buildMonthlyDisplaySummary,
+  withDisplayAmount,
+} from "./transaction-display.js";
 
 export class TransactionService {
   private toStartOfDay(date: string): Date {
@@ -22,8 +30,13 @@ export class TransactionService {
   private toEndOfDay(date: string): Date {
     return new Date(`${date}T23:59:59.999Z`);
   }
-  async parseTransactionInput(input: string) {
-    const parsed = await parseTransaction(input);
+  async parseTransactionInput(
+    input: string,
+    currencyContext?: CurrencyContext,
+  ) {
+    const parsed = parseTransaction(input, {
+      ...(currencyContext !== undefined && { currencyContext }),
+    });
 
     return {
       amount: parsed.amount,
@@ -112,7 +125,7 @@ export class TransactionService {
       dateTo,
 
       confidenceMin,
-      currency,
+      displayCurrency,
     } = query;
 
     const skip = (page - 1) * limit;
@@ -160,10 +173,6 @@ export class TransactionService {
       };
     }
 
-    if (currency) {
-      where.currency = currency;
-    }
-
     const orderBy: Prisma.TransactionOrderByWithRelationInput = {
       [sortBy]: sortOrder,
     };
@@ -177,7 +186,9 @@ export class TransactionService {
     });
 
     return {
-      data: result.transactions,
+      data: result.transactions.map((transaction) =>
+        withDisplayAmount(transaction, displayCurrency as CurrencyCode),
+      ),
 
       meta: {
         page,
@@ -238,32 +249,16 @@ export class TransactionService {
   }
 
   async getMonthlySummary(userId: string, query: MonthlySummaryQuery) {
-    const result = await transactionRepository.monthlySummary(userId, {
-      currency: query.currency,
-    });
+    const transactions = await transactionRepository.findForSummary(userId);
 
-    return result.map((item) => {
-      const [year, month] = item.month.split("-");
-
-      return {
-        year: Number(year),
-        month: Number(month),
-
-        totalAmount: Number(item.totalSpending),
-
-        transactionCount: item.transactionCount,
-
-        avgAmount: Number(item.averageAmount),
-
-        currency: query.currency,
-      };
-    });
+    return buildMonthlyDisplaySummary(
+      transactions,
+      query.displayCurrency as CurrencyCode,
+    );
   }
 
   async getCategorySummary(userId: string, query: CategorySummaryQuery) {
-    const filters: SummaryDateFilter = {
-      currency: query.currency,
-    };
+    const filters: SummaryDateFilter = {};
 
     if (query.dateFrom) {
       filters.dateFrom = this.toStartOfDay(query.dateFrom);
@@ -272,31 +267,19 @@ export class TransactionService {
     if (query.dateTo) {
       filters.dateTo = this.toEndOfDay(query.dateTo);
     }
-    const result = await transactionRepository.categorySummary(userId, filters);
-
-    const totalAmount = result.reduce(
-      (sum, item) => sum + Number(item._sum.amount || 0),
-      0,
+    const transactions = await transactionRepository.findForSummary(
+      userId,
+      filters,
     );
 
-    return result.map((item) => ({
-      category: item.category,
-
-      totalAmount: Number(item._sum.amount || 0),
-
-      transactionCount: item._count.category,
-
-      percentage:
-        totalAmount === 0
-          ? 0
-          : (Number(item._sum.amount || 0) / totalAmount) * 100,
-    }));
+    return buildCategoryDisplaySummary(
+      transactions,
+      query.displayCurrency as CurrencyCode,
+    );
   }
 
   async getMerchantSummary(userId: string, query: MerchantSummaryQuery) {
-    const filters: SummaryDateFilter = {
-      currency: query.currency,
-    };
+    const filters: SummaryDateFilter = {};
 
     if (query.dateFrom) {
       filters.dateFrom = this.toStartOfDay(query.dateFrom);
@@ -305,19 +288,16 @@ export class TransactionService {
     if (query.dateTo) {
       filters.dateTo = this.toEndOfDay(query.dateTo);
     }
-    const result = await transactionRepository.merchantSummary(
+    const transactions = await transactionRepository.findForSummary(
       userId,
       filters,
-      query.limit,
     );
 
-    return result.map((item) => ({
-      merchantName: item.merchantName || "Unknown",
-
-      totalAmount: Number(item._sum.amount || 0),
-
-      transactionCount: item._count.merchantName,
-    }));
+    return buildMerchantDisplaySummary(
+      transactions,
+      query.displayCurrency as CurrencyCode,
+      query.limit,
+    );
   }
 }
 

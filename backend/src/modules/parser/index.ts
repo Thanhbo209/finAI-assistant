@@ -24,6 +24,16 @@ export {
 } from "./constants/parser.constants.js";
 export type { Category, MissingField } from "./constants/parser.constants.js";
 
+// Amount extractor
 export { extractAmount } from "./feature/extractors/amount/extract-amount.js";
+export type { ExtractAmountOptions } from "./feature/extractors/amount/extract-amount.js";
 export type { AmountCandidate } from "./feature/extractors/amount/amount.types.js";
-export { MULTI_NUMBER_STRATEGY } from "./feature/extractors/amount/amount.constants.js";
+export {
+  MULTI_NUMBER_STRATEGY,
+  CURRENCY_CODES,
+  resolveCurrency,
+} from "./feature/extractors/amount/amount.constants.js";
+export type {
+  CurrencyCode,
+  CurrencyContext,
+} from "./feature/extractors/amount/amount.constants.js";

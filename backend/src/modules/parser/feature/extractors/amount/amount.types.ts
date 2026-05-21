@@ -8,7 +8,12 @@ import type { CurrencyCode } from "./amount.constants.js";
  */
 export interface AmountCandidate {
   value: number;
-  currency: CurrencyCode;
+  /**
+   * Currency detected by the scanner.
+   * undefined for bare candidates (no explicit currency in input) —
+   * the final currency is resolved via CurrencyContext in extractAmount().
+   */
+  currency: CurrencyCode | undefined;
   /** Substring that triggered the match, for rawMatch on the final result */
   rawMatch: string;
   /**

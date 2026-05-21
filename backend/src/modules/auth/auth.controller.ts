@@ -59,3 +59,23 @@ export const getMe = async (
     next(error);
   }
 };
+
+export const updateCurrency = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const userId = req.user!.userId;
+    const { currency } = req.body as { currency: string };
+
+    const result = await authService.updatePreferredCurrency(userId, currency);
+
+    return res.status(200).json({
+      message: "Currency updated successfully",
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

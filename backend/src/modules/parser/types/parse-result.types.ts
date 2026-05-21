@@ -15,7 +15,7 @@ export interface ParseResult {
   amount: number | null;
   currency: string;
   merchantName: string | null;
-  category: CategoryDisplayName;
+  category: Category | null;
   transactionDate: Date;
 
   // ── Input representation ──────────────────────────────────────────

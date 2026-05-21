@@ -1,5 +1,9 @@
 import { z } from "zod";
 import { TransactionCategory } from "../../generated/prisma/index.js";
+import {
+  normalizeCurrencyCode,
+  SUPPORTED_CURRENCIES,
+} from "../../common/constants/currency.constants.js";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Shared primitives
@@ -40,6 +44,11 @@ const PositiveDecimal = z
 
 const Confidence = z.number().min(0).max(1);
 
+const CurrencyCodeSchema = z.preprocess(
+  (value) => (typeof value === "string" ? normalizeCurrencyCode(value) : value),
+  z.enum(SUPPORTED_CURRENCIES),
+);
+
 // POST /transactions/parse
 
 export const ParseInputSchema = z.object({
@@ -47,6 +56,18 @@ export const ParseInputSchema = z.object({
     .string()
     .min(1, "input is required")
     .max(500, "input must be at most 500 characters"),
+  /**
+   * Optional currency context forwarded from the frontend session.
+   * Enables bare-number amounts to inherit the correct currency rather
+   * than silently defaulting to USD.
+   */
+  currencyContext: z
+    .object({
+      activeCurrency: CurrencyCodeSchema.optional(),
+      userPreferredCurrency: CurrencyCodeSchema.optional(),
+      localeCurrency: CurrencyCodeSchema.optional(),
+    })
+    .optional(),
 });
 
 export type ParseInputDTO = z.infer<typeof ParseInputSchema>;
@@ -54,7 +75,7 @@ export type ParseInputDTO = z.infer<typeof ParseInputSchema>;
 // Parser result embedded in create request
 const ParserResultSchema = z.object({
   amount: z.number().nullable(),
-  currency: z.string().default("USD"), // Default to USD if not provided
+  currency: CurrencyCodeSchema.default("USD"),
   merchantName: z.string().nullable(),
   category: CategoryEnum.nullable(),
   confidenceScore: Confidence,
@@ -75,7 +96,7 @@ export const CreateTransactionSchema = z.object({
     merchantName: z.string().min(1).max(200).nullable().default(null),
     category: CategoryEnum,
     transactionDate: IsoDateString,
-    currency: z.string().default("USD"),
+    currency: CurrencyCodeSchema.default("USD"),
   }),
 });
 
@@ -120,7 +141,7 @@ export const ListTransactionsQuerySchema = z
     amountMin: z.coerce.number().positive().optional(),
     amountMax: z.coerce.number().positive().optional(),
     confidenceMin: z.coerce.number().min(0).max(1).optional(),
-    currency: z.string().length(3).optional(), // ISO currency code
+    displayCurrency: CurrencyCodeSchema.default("USD"),
   })
   .refine(
     (data) => {
@@ -146,7 +167,7 @@ export const MonthlySummaryQuerySchema = z.object({
     .min(2000)
     .max(2100)
     .default(new Date().getFullYear()),
-  currency: z.string().length(3).default("USD"),
+  displayCurrency: CurrencyCodeSchema.default("USD"),
 });
 
 export type MonthlySummaryQuery = z.infer<typeof MonthlySummaryQuerySchema>;
@@ -156,7 +177,7 @@ export type MonthlySummaryQuery = z.infer<typeof MonthlySummaryQuerySchema>;
 export const CategorySummaryQuerySchema = z.object({
   dateFrom: IsoDateString.optional(),
   dateTo: IsoDateString.optional(),
-  currency: z.string().length(3).default("USD"),
+  displayCurrency: CurrencyCodeSchema.default("USD"),
 });
 
 export type CategorySummaryQuery = z.infer<typeof CategorySummaryQuerySchema>;
@@ -167,7 +188,7 @@ export const MerchantSummaryQuerySchema = z.object({
   dateFrom: IsoDateString.optional(),
   dateTo: IsoDateString.optional(),
   limit: z.coerce.number().int().min(1).max(50).default(10),
-  currency: z.string().length(3).default("USD"),
+  displayCurrency: CurrencyCodeSchema.default("USD"),
 });
 
 export type MerchantSummaryQuery = z.infer<typeof MerchantSummaryQuerySchema>;

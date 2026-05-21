@@ -22,6 +22,11 @@ export interface TransactionRecord {
   userId: string;
   amount: number;
   currency: string;
+  originalAmount?: number;
+  originalCurrency?: string;
+  displayAmount?: number;
+  displayCurrency?: string;
+  exchangeRate?: number;
   merchantName: string | null;
   category: string;
   transactionDate: string;
@@ -78,10 +83,12 @@ export interface CategorySummary {
   totalAmount: number;
   transactionCount: number;
   percentage: number;
+  currency: string;
 }
 
 export interface MerchantSummary {
   merchantName: string;
   totalAmount: number;
   transactionCount: number;
+  currency: string;
 }

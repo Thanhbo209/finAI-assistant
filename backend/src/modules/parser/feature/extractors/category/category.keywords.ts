@@ -85,4 +85,5 @@ export const KEYWORD_MAP: readonly KeywordEntry[] = [
   { keyword: "internet", category: "UTILITIES" },
   { keyword: "wifi", category: "UTILITIES" },
   { keyword: "phone bill", category: "UTILITIES" },
+  { keyword: "cigarettes", category: "UTILITIES" },
 ] as const;

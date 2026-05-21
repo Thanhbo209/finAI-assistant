@@ -34,7 +34,7 @@ describe("parseTransaction() — core scenarios", () => {
     expect(r.amount).toBe(45);
     expect(r.currency).toBe("USD");
     expect(r.merchantName).toBe("Uber");
-    expect(r.category).toBe("Transportation");
+    expect(r.category).toBe("TRANSPORTATION");
 
     expect(isoDate(r.transactionDate)).toBe("2025-05-14");
 
@@ -56,7 +56,7 @@ describe("parseTransaction() — core scenarios", () => {
     expect(r.amount).toBe(15);
     expect(r.currency).toBe("USD");
     expect(r.merchantName).toBe("Netflix");
-    expect(r.category).toBe("Subscriptions");
+    expect(r.category).toBe("SUBSCRIPTIONS");
 
     expect(r.missingFields).toHaveLength(0);
     expect(r.followUpQuestion).toBeNull();
@@ -71,7 +71,7 @@ describe("parseTransaction() — core scenarios", () => {
 
     expect(r.merchantName).toBeNull();
 
-    expect(r.category).toBe("Food & Drink");
+    expect(r.category).toBe("FOOD_DRINK");
 
     expect(r.missingFields).toContain("merchant");
     expect(r.missingFields).not.toContain("amount");
@@ -100,7 +100,7 @@ describe("parseTransaction() — core scenarios", () => {
 
     expect(r.merchantName).toBeNull();
 
-    expect(r.category).toBe("Unknown");
+    expect(r.category).toBe("UNKNOWN");
 
     expect(r.missingFields).toContain("amount");
     expect(r.missingFields).toContain("merchant");
@@ -115,7 +115,7 @@ describe("parseTransaction() — core scenarios", () => {
 
     expect(r.amount).toBe(300);
 
-    expect(r.category).toBe("Travel");
+    expect(r.category).toBe("TRAVEL");
 
     expect(r.missingFields).toContain("merchant");
 
@@ -127,7 +127,7 @@ describe("parseTransaction() — core scenarios", () => {
 
     expect(r.amount).toBeNull();
 
-    expect(r.category).toBe("Entertainment");
+    expect(r.category).toBe("ENTERTAINMENT");
 
     expect(r.missingFields).toContain("amount");
 
@@ -141,7 +141,7 @@ describe("parseTransaction() — core scenarios", () => {
 
     expect(r.merchantName).toBeNull();
 
-    expect(r.category).toBe("Food & Drink");
+    expect(r.category).toBe("FOOD_DRINK");
 
     expect(r.missingFields).toContain("amount");
     expect(r.missingFields).toContain("merchant");
@@ -156,7 +156,7 @@ describe("parseTransaction() — core scenarios", () => {
 
     expect(r.merchantName).toBeNull();
 
-    expect(r.category).toBe("Unknown");
+    expect(r.category).toBe("UNKNOWN");
 
     expect(r.descriptionRaw).toBe("");
     expect(r.descriptionNormalized).toBe("");
@@ -293,7 +293,7 @@ describe("parseTransaction() — merchant integration", () => {
 
     expect(r.merchantName).toBe("McDonald's");
 
-    expect(r.category).toBe("Food & Drink");
+    expect(r.category).toBe("FOOD_DRINK");
   });
 
   it('"spotify premium 9"', () => {
@@ -301,7 +301,7 @@ describe("parseTransaction() — merchant integration", () => {
 
     expect(r.merchantName).toBe("Spotify");
 
-    expect(r.category).toBe("Subscriptions");
+    expect(r.category).toBe("SUBSCRIPTIONS");
   });
 
   it('"grab airport 30"', () => {
@@ -309,7 +309,7 @@ describe("parseTransaction() — merchant integration", () => {
 
     expect(r.merchantName).toBe("Grab");
 
-    expect(r.category).toBe("Transportation");
+    expect(r.category).toBe("TRANSPORTATION");
   });
 });
 
@@ -321,7 +321,7 @@ describe("parseTransaction() — category integration", () => {
   it("merchant category overrides keyword category", () => {
     const r = parse("uber food 20");
 
-    expect(r.category).toBe("Transportation");
+    expect(r.category).toBe("TRANSPORTATION");
   });
 
   it("keyword fallback works without merchant", () => {
@@ -329,13 +329,13 @@ describe("parseTransaction() — category integration", () => {
 
     expect(r.merchantName).toBeNull();
 
-    expect(r.category).toBe("Health");
+    expect(r.category).toBe("HEALTH");
   });
 
   it("unknown merchant + no keywords → Unknown", () => {
     const r = parse("xyzco 50");
 
-    expect(r.category).toBe("Unknown");
+    expect(r.category).toBe("UNKNOWN");
   });
 });
 

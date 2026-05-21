@@ -1,7 +1,4 @@
-import {
-  CATEGORY_DISPLAY_NAMES,
-  PARSER_VERSION,
-} from "../constants/parser.constants.js";
+import { PARSER_VERSION } from "../constants/parser.constants.js";
 import { extractAmount } from "../feature/extractors/amount/extract-amount.js";
 import { resolveCategory } from "../feature/extractors/category/category.resolver.js";
 import { composeConfidence } from "../feature/extractors/confidence/confidence.composer.js";
@@ -9,11 +6,18 @@ import { extractMerchant } from "../feature/extractors/merchant/extract-merchant
 import { detectMissingFields } from "../feature/extractors/missing-fields/missing-fields.detector.js";
 import { generateFollowUp } from "../feature/follow-up/follow-up.generator.js";
 import { normalizeInput } from "../feature/normalization/normalize.input.js";
+import type { CurrencyContext } from "../feature/extractors/amount/amount.constants.js";
 import type { ParseResult } from "../types/parse-result.types.js";
 
 export interface ParseTransactionOptions {
   /** Inject a fixed reference date for deterministic date testing */
   transactionDate?: Date;
+  /**
+   * Session/profile currency context.
+   * When provided, bare-number amounts ("coffee 50") inherit the currency
+   * from activeCurrency → userPreferredCurrency → localeCurrency → USD.
+   */
+  currencyContext?: CurrencyContext;
 }
 
 /**
@@ -22,7 +26,7 @@ export interface ParseTransactionOptions {
  * Pipeline (data flows forward only — no stage calls another stage internally):
  *
  *   1. normalizeInput      raw string → { raw, normalized }
- *   2. extractAmount       normalized → AmountResult
+ *   2. extractAmount       normalized + currencyContext → AmountResult
  *   3. extractMerchant     normalized → MerchantResult
  *   4. resolveCategory     normalized + MerchantResult → CategoryResult
  *   5. extractDate         normalized → DateResult
@@ -35,7 +39,7 @@ export interface ParseTransactionOptions {
  * It is the integration layer only — all logic lives in dedicated modules.
  *
  * Pure function — no DB, no API, no logging, no side effects.
- * Same input always produces same output (given same referenceDate).
+ * Same input always produces same output (given same referenceDate and currencyContext).
  */
 
 function resolveTransactionDate(transactionDate?: Date): Date {
@@ -55,8 +59,13 @@ export function parseTransaction(
   // stage 1: normalize
   const { raw, normalized } = normalizeInput(rawInput);
 
-  // stage 2: extract amount
-  const amountResult = extractAmount(normalized);
+  // stage 2: extract amount (now context-aware)
+  const amountResult = extractAmount({
+    normalizedInput: normalized,
+    ...(options.currencyContext !== undefined && {
+      currencyContext: options.currencyContext,
+    }),
+  });
 
   // stage 3: extract merchant
   const merchantResult = extractMerchant(normalized);
@@ -86,7 +95,7 @@ export function parseTransaction(
     },
   });
 
-  // step 8: compose confident
+  // step 8: compose confidence
   const { score: confidenceScore } = composeConfidence({
     amountResult,
     merchantResult,
@@ -101,7 +110,7 @@ export function parseTransaction(
     amount: amountResult.value,
     currency: amountResult.currency,
     merchantName: merchantResult.canonicalName,
-    category: CATEGORY_DISPLAY_NAMES[categoryResult.value],
+    category: categoryResult.value,
     transactionDate,
     descriptionRaw: raw,
     descriptionNormalized: normalized,

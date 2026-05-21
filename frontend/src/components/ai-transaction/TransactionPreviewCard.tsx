@@ -1,18 +1,34 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Calendar, Store, Tag, DollarSign, Pencil } from "lucide-react";
 import { ConfidenceBadge } from "./ConfidenceBadge";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { CATEGORY_COLORS, CATEGORY_LABELS } from "@/types/category";
-import { formatCurrency, formatDate } from "@/lib/helper";
+import { formatCurrency, formatDate, formatDateInput } from "@/lib/helper";
 import { cn } from "@/lib/utils";
 import type { ParseResult } from "@/types/transaction";
 import type { OverrideValues } from "@/types/chat";
+import type { TransactionCategory } from "@/types/category";
+
+const ALL_CATEGORIES = Object.entries(CATEGORY_LABELS) as [
+  TransactionCategory,
+  string,
+][];
 
 interface TransactionPreviewCardProps {
   parseResult: ParseResult;
   overrides: OverrideValues;
   onConfirm: () => void;
-  onEdit: () => void;
+  onUpdateOverrides: (overrides: OverrideValues) => void;
   isSaving: boolean;
 }
 
@@ -79,13 +95,20 @@ export function TransactionPreviewCard({
   parseResult,
   overrides,
   onConfirm,
-  onEdit,
+  onUpdateOverrides,
   isSaving,
 }: TransactionPreviewCardProps) {
   const finalAmount = overrides.amount ?? parseResult.amount;
   const finalMerchant = overrides.merchant ?? parseResult.merchantName;
   const finalCategory = overrides.category ?? parseResult.category;
   const finalDate = overrides.date ?? new Date().toISOString();
+  const [isEditing, setIsEditing] = useState(false);
+  const [draftAmount, setDraftAmount] = useState("");
+  const [draftMerchant, setDraftMerchant] = useState("");
+  const [draftCategory, setDraftCategory] = useState<TransactionCategory | "">(
+    "",
+  );
+  const [draftDate, setDraftDate] = useState("");
 
   const categoryColor = finalCategory
     ? CATEGORY_COLORS[finalCategory]
@@ -93,6 +116,9 @@ export function TransactionPreviewCard({
   const categoryLabel = finalCategory
     ? (CATEGORY_LABELS[finalCategory] ?? finalCategory)
     : null;
+  const categorySuggestion = parseResult.intelligence?.categorySuggestion;
+  const aiSuggestion = parseResult.intelligence?.aiSuggestion;
+  const merchantResolved = Boolean(parseResult.intelligence?.merchantId);
 
   const rows: FieldRowProps[] = [
     {
@@ -115,7 +141,8 @@ export function TransactionPreviewCard({
       label: "Merchant",
       value: finalMerchant ?? null,
       overridden:
-        !!overrides.merchant && overrides.merchant !== parseResult.merchantName,
+        overrides.merchant !== undefined &&
+        overrides.merchant !== parseResult.merchantName,
       original: parseResult.merchantName,
     },
     {
@@ -133,8 +160,48 @@ export function TransactionPreviewCard({
       icon: Calendar,
       label: "Date",
       value: formatDate(finalDate),
+      overridden: overrides.date !== undefined,
     },
   ];
+
+  const amountValue = parseFloat(draftAmount);
+  const hasInvalidAmount =
+    draftAmount.trim() !== "" && Number.isNaN(amountValue);
+
+  const handleStartEdit = () => {
+    setDraftAmount(finalAmount !== null ? String(finalAmount) : "");
+    setDraftMerchant(finalMerchant ?? "");
+    setDraftCategory(finalCategory ?? "");
+    setDraftDate(formatDateInput(finalDate));
+    setIsEditing(true);
+  };
+
+  const handleCancelEdit = () => {
+    setDraftAmount(finalAmount !== null ? String(finalAmount) : "");
+    setDraftMerchant(finalMerchant ?? "");
+    setDraftCategory(finalCategory ?? "");
+    setDraftDate(formatDateInput(finalDate));
+    setIsEditing(false);
+  };
+
+  const handleSaveEdit = () => {
+    if (hasInvalidAmount) return;
+
+    const nextOverrides: OverrideValues = {};
+    if (draftAmount.trim() !== "") {
+      nextOverrides.amount = amountValue;
+    }
+    nextOverrides.merchant = draftMerchant.trim();
+    if (draftCategory) {
+      nextOverrides.category = draftCategory;
+    }
+    if (draftDate) {
+      nextOverrides.date = draftDate;
+    }
+
+    onUpdateOverrides(nextOverrides);
+    setIsEditing(false);
+  };
 
   return (
     <motion.div
@@ -158,41 +225,163 @@ export function TransactionPreviewCard({
         <ConfidenceBadge score={parseResult.confidenceScore} showScore />
       </div>
 
+      {(categorySuggestion || aiSuggestion || merchantResolved) && (
+        <div className="flex flex-wrap gap-1.5 border-b border-border/40 px-4 py-2">
+          {merchantResolved && <Badge variant="outline">merchant resolved</Badge>}
+          {categorySuggestion && (
+            <Badge variant="secondary">
+              {formatSuggestionSource(categorySuggestion.source)}
+            </Badge>
+          )}
+          {aiSuggestion && (
+            <Badge variant="outline">
+              AI assisted {Math.round(aiSuggestion.confidence * 100)}%
+            </Badge>
+          )}
+        </div>
+      )}
+
       {/* Fields */}
       <div className="px-4 py-1">
-        {rows.map((row, i) => (
+        {isEditing ? (
           <motion.div
-            key={row.label}
-            initial={{ opacity: 0, x: -8 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: i * 0.06, duration: 0.25 }}
+            className="space-y-3 py-3"
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2 }}
           >
-            <FieldRow {...row} />
+            <div className="grid gap-1.5">
+              <label className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">
+                Amount
+              </label>
+              <Input
+                type="number"
+                step="0.01"
+                inputMode="decimal"
+                value={draftAmount}
+                onChange={(event) => setDraftAmount(event.target.value)}
+                placeholder="0.00"
+                aria-invalid={hasInvalidAmount}
+              />
+            </div>
+
+            <div className="grid gap-1.5">
+              <label className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">
+                Merchant
+              </label>
+              <Input
+                value={draftMerchant}
+                onChange={(event) => setDraftMerchant(event.target.value)}
+                placeholder="e.g. Starbucks"
+              />
+            </div>
+
+            <div className="grid gap-1.5">
+              <label className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">
+                Category
+              </label>
+              <Select
+                value={draftCategory}
+                onValueChange={(value) =>
+                  setDraftCategory(value as TransactionCategory)
+                }
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {ALL_CATEGORIES.map(([value, label]) => (
+                    <SelectItem key={value} value={value}>
+                      {label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="grid gap-1.5">
+              <label className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">
+                Date
+              </label>
+              <Input
+                type="date"
+                value={draftDate}
+                onChange={(event) => setDraftDate(event.target.value)}
+              />
+            </div>
           </motion.div>
-        ))}
+        ) : (
+          rows.map((row, i) => (
+            <motion.div
+              key={row.label}
+              initial={{ opacity: 0, x: -8 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: i * 0.06, duration: 0.25 }}
+            >
+              <FieldRow {...row} />
+            </motion.div>
+          ))
+        )}
       </div>
 
       {/* Actions */}
       <div className="flex gap-2 px-4 pb-4 pt-3">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onEdit}
-          disabled={isSaving}
-          className="flex-1 gap-1.5"
-        >
-          <Pencil className="h-3.5 w-3.5" />
-          Edit
-        </Button>
-        <Button
-          size="sm"
-          onClick={onConfirm}
-          disabled={isSaving}
-          className={cn("flex-[2] gap-1.5", isSaving && "animate-pulse")}
-        >
-          {isSaving ? "Saving..." : "Confirm & Save"}
-        </Button>
+        {isEditing ? (
+          <>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleCancelEdit}
+              disabled={isSaving}
+              className="flex-1"
+            >
+              Cancel
+            </Button>
+            <Button
+              size="sm"
+              onClick={handleSaveEdit}
+              disabled={isSaving || hasInvalidAmount}
+              className="flex-[2]"
+            >
+              Save changes
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleStartEdit}
+              disabled={isSaving}
+              className="flex-1 gap-1.5"
+            >
+              <Pencil className="h-3.5 w-3.5" />
+              Edit
+            </Button>
+            <Button
+              size="sm"
+              onClick={onConfirm}
+              disabled={isSaving}
+              className={cn("flex-[2] gap-1.5", isSaving && "animate-pulse")}
+            >
+              {isSaving ? "Saving..." : "Confirm & Save"}
+            </Button>
+          </>
+        )}
       </div>
     </motion.div>
   );
+}
+
+function formatSuggestionSource(source: string): string {
+  switch (source) {
+    case "SMART_RULE":
+      return "smart rule";
+    case "USER_PREFERENCE":
+      return "personalized";
+    case "MERCHANT_TENDENCY":
+      return "merchant tendency";
+    default:
+      return "suggested";
+  }
 }

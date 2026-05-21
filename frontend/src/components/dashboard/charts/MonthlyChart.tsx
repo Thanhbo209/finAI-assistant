@@ -54,11 +54,11 @@ function CustomTooltip({ active, payload, label, currency }: TooltipProps) {
   if (!active || !payload?.length) return null;
   return (
     <div className="rounded-xl border border-border bg-card px-3.5 py-2.5 shadow-lg text-xs">
-      <p className="font-semibold text-foreground mb-1">{label}</p>
+      <p className=" mb-1 font-bold">{label}</p>
       <p className="text-primary font-bold">
         {formatCurrency(payload[0].value, currency)}
       </p>
-      <p className="text-muted-foreground">
+      <p className="text-muted-primary">
         {payload[0].payload.count} transactions
       </p>
     </div>
@@ -89,32 +89,32 @@ export function MonthlyChart({ data }: MonthlyChartProps) {
       >
         <defs>
           <linearGradient id="spendGradient" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#6366f1" stopOpacity={0.2} />
-            <stop offset="100%" stopColor="#6366f1" stopOpacity={0} />
+            <stop offset="0%" stopColor="#5ee5bc" stopOpacity={0.2} />
+            <stop offset="100%" stopColor="#5ee5bc" stopOpacity={0} />
           </linearGradient>
         </defs>
         <CartesianGrid
           strokeDasharray="3 3"
           stroke="hsl(var(--border))"
           vertical={false}
-          opacity={0.6}
         />
         <XAxis
           dataKey="label"
           tick={{
             fontSize: 11,
-            fill: "hsl(var(--muted-foreground))",
+            fill: "hsl(var(--primary))",
             fontFamily: "inherit",
           }}
           axisLine={false}
           tickLine={false}
           dy={4}
         />
+
         <YAxis
           domain={[0, yMax]}
           tick={{
             fontSize: 11,
-            fill: "hsl(var(--muted-foreground))",
+            fill: "hsl(var(--primary))",
             fontFamily: "inherit",
           }}
           axisLine={false}
@@ -124,18 +124,18 @@ export function MonthlyChart({ data }: MonthlyChartProps) {
         />
         <Tooltip
           content={<CustomTooltip currency={currency} />}
-          cursor={{ stroke: "#6366f1", strokeWidth: 1, strokeDasharray: "4 4" }}
+          cursor={{ stroke: "#5ee5bc", strokeWidth: 1, strokeDasharray: "4 4" }}
         />
         <Area
           type="monotone"
           dataKey="total"
-          stroke="#6366f1"
+          stroke="#5ee5bc"
           strokeWidth={2.5}
           fill="url(#spendGradient)"
-          dot={{ fill: "#6366f1", r: 3.5, strokeWidth: 0 }}
+          dot={{ fill: "#5ee5bc", r: 3.5, strokeWidth: 0 }}
           activeDot={{
             r: 5.5,
-            fill: "#6366f1",
+            fill: "#5ee5bc",
             stroke: "#fff",
             strokeWidth: 2,
           }}

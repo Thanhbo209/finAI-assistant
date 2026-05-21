@@ -11,6 +11,7 @@ import { StatCards } from "@/components/dashboard/cards/StatCards";
 import { MonthlyChart } from "@/components/dashboard/charts/MonthlyChart";
 import { CategoryChart } from "@/components/dashboard/charts/CategoryChart";
 import { MerchantChart } from "@/components/dashboard/charts/MerchantChart";
+import { IntelligenceCards } from "@/components/dashboard/cards/IntelligenceCards";
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -75,11 +76,15 @@ export default function DashboardPage() {
       {/* Stat Cards */}
       <StatCards {...stats} />
 
+      <IntelligenceCards />
+
       {/* Charts row 1 */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <Card className="lg:col-span-2">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base">Monthly Spending</CardTitle>
+            <CardTitle className="text-base  font-bold">
+              Monthly Spending
+            </CardTitle>
           </CardHeader>
           <CardContent>
             {monthly.length === 0 ? (
@@ -92,7 +97,7 @@ export default function DashboardPage() {
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-base">By Category</CardTitle>
+            <CardTitle className="text-base font-bold">By Category</CardTitle>
           </CardHeader>
           <CardContent>
             {category.length === 0 ? (
@@ -107,7 +112,7 @@ export default function DashboardPage() {
       {/* Charts row 2 */}
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-base">Top Merchants</CardTitle>
+          <CardTitle className="text-base font-bold">Top Merchants</CardTitle>
         </CardHeader>
         <CardContent>
           {merchant.length === 0 ? (
@@ -130,7 +135,7 @@ function getGreeting(): string {
 
 function EmptyState({ message }: { message: string }) {
   return (
-    <div className="flex flex-col items-center justify-center h-[220px] text-muted-foreground gap-2">
+    <div className="flex flex-col items-center justify-center h-55 text-muted-foreground gap-2">
       <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
         <AlertCircle className="h-4 w-4" />
       </div>

@@ -5,21 +5,24 @@ import { UserBubble } from "./UserBubble";
 import { AIThinkingBubble } from "./AIThinkingBubble";
 import { TransactionPreviewCard } from "./TransactionPreviewCard";
 import { TransactionSuccess } from "./TransactionSuccess";
-import type { ChatMessage } from "@/types/chat";
+import type { ChatMessage, OverrideValues } from "@/types/chat";
 import type { TransactionCategory } from "@/types/category";
 
 interface ChatContainerProps {
   messages: ChatMessage[];
   isSaving: boolean;
   onConfirm: () => void;
-  onEdit: () => void;
+  onUpdatePreviewOverrides: (
+    messageId: string,
+    overrides: OverrideValues,
+  ) => void;
 }
 
 export function ChatContainer({
   messages,
   isSaving,
   onConfirm,
-  onEdit,
+  onUpdatePreviewOverrides,
 }: ChatContainerProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -69,7 +72,9 @@ export function ChatContainer({
                       parseResult={msg.parseResult}
                       overrides={msg.overrides}
                       onConfirm={onConfirm}
-                      onEdit={onEdit}
+                      onUpdateOverrides={(overrides) =>
+                        onUpdatePreviewOverrides(msg.id, overrides)
+                      }
                       isSaving={isSaving}
                     />
                   </div>

@@ -33,7 +33,7 @@ export function AIThinkingBubble() {
             animate={{ opacity: [0.3, 1, 0.3] }}
             transition={{ duration: 1.2, repeat: Infinity }}
           />
-          <span className="text-xs text-muted-foreground font-medium">
+          <span className="text-xs text-muted-foreground font-bold">
             Analyzing transaction…
           </span>
         </div>

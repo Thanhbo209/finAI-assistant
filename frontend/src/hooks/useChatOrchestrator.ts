@@ -24,6 +24,11 @@ type Action =
   | { type: "ADD_MSG"; msg: ChatMessage }
   | { type: "REMOVE_MSG"; id: string }
   | { type: "SET_CHAT_STATE"; state: ChatState }
+  | {
+      type: "UPDATE_PREVIEW_OVERRIDES";
+      messageId: string;
+      overrides: OverrideValues;
+    }
   | { type: "RESET" };
 
 function reducer(state: OrchestratorState, action: Action): OrchestratorState {
@@ -37,6 +42,25 @@ function reducer(state: OrchestratorState, action: Action): OrchestratorState {
       };
     case "SET_CHAT_STATE":
       return { ...state, chatState: action.state };
+    case "UPDATE_PREVIEW_OVERRIDES": {
+      const messages = state.messages.map((message) =>
+        message.type === "preview" && message.id === action.messageId
+          ? { ...message, overrides: action.overrides }
+          : message,
+      );
+
+      if (
+        state.chatState.status === "confirming" ||
+        state.chatState.status === "saving"
+      ) {
+        return {
+          messages,
+          chatState: { ...state.chatState, overrides: action.overrides },
+        };
+      }
+
+      return { ...state, messages };
+    }
     case "RESET":
       return { messages: [], chatState: { status: "idle" } };
     default:
@@ -342,8 +366,10 @@ export function useChatOrchestrator() {
     try {
       const finalAmount = overrides.amount ?? parseResult.amount ?? 0;
       const finalMerchant =
-        overrides.merchant ?? parseResult.merchantName ?? null;
+        (overrides.merchant ?? parseResult.merchantName)?.trim() || null;
       const finalCategory = overrides.category ?? parseResult.category ?? null;
+      const finalDate =
+        overrides.date ?? new Date().toISOString().split("T")[0];
 
       await transactionApi.create({
         parserResult: {
@@ -365,7 +391,7 @@ export function useChatOrchestrator() {
           merchantName: finalMerchant,
           category: finalCategory,
           isConfirmed: true,
-          transactionDate: new Date().toISOString().split("T")[0],
+          transactionDate: finalDate,
         },
       });
 
@@ -391,14 +417,12 @@ export function useChatOrchestrator() {
     }
   }, [state.chatState, addMsg, setChatState]);
 
-  const handleEdit = useCallback(() => {
-    addMsg({
-      id: genId(),
-      type: "ai",
-      text: "Sure. Describe the correction, or use the fields in the card above to edit.",
-      timestamp: new Date(),
-    });
-  }, [addMsg]);
+  const handleUpdatePreviewOverrides = useCallback(
+    (messageId: string, overrides: OverrideValues) => {
+      dispatch({ type: "UPDATE_PREVIEW_OVERRIDES", messageId, overrides });
+    },
+    [],
+  );
 
   const handleReset = useCallback(() => {
     dispatch({ type: "RESET" });
@@ -439,7 +463,7 @@ export function useChatOrchestrator() {
     handleFollowUpAnswer,
     handleFollowUpSkip,
     handleConfirm,
-    handleEdit,
+    handleUpdatePreviewOverrides,
     handleReset,
   };
 }

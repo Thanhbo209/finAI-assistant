@@ -43,6 +43,17 @@ export const MERCHANT_DICTIONARY: readonly MerchantEntry[] = [
     defaultCategory: "TRANSPORTATION",
   },
   {
+    canonicalName: "Shopee",
+    aliases: [
+      "shopee eats",
+      "shopee trip",
+      "shopee",
+      "shopee foods",
+      "shopee food",
+    ],
+    defaultCategory: "TRANSPORTATION",
+  },
+  {
     canonicalName: "Grab",
     aliases: ["grabfood", "grab food", "grab car", "grab"],
     defaultCategory: "TRANSPORTATION",

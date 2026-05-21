@@ -61,18 +61,20 @@ const GOOD_DATE = makeDate("explicit", 0.95);
 const NO_MERCHANT = makeMerchant(null, 0.1); // NO_MATCH floor
 const DEFAULT_DATE = makeDate("default", 0.4);
 
+// Suppress unused-variable warnings for date fixtures kept for documentation
+void GOOD_DATE;
+void DEFAULT_DATE;
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Spec-required scenarios
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe("detectMissingFields() — spec scenarios", () => {
   it('"netflix" — amount missing, merchant found, no date', () => {
-    // netflix: no amount extracted
     const missing = detectMissingFields({
-      amountResult: makeAmount(null, 0.1), // NO_NUMBER score
+      amountResult: makeAmount(null, 0.1),
       merchantResult: makeMerchant("Netflix", 0.95),
       categoryResult: makeCategory("Subscriptions", 0.9),
-      dateResult: DEFAULT_DATE,
     });
     expect(missing).toContain("amount");
     expect(missing).not.toContain("merchant");
@@ -80,18 +82,13 @@ describe("detectMissingFields() — spec scenarios", () => {
 
   it('"coffee 5" — amount present, merchant absent (generic), category UNKNOWN', () => {
     const missing = detectMissingFields({
-      amountResult: makeAmount(5, 0.4), // bare number — above threshold
-      merchantResult: NO_MERCHANT, // 0.10 — below MIN_CONFIDENCE.MERCHANT
-      categoryResult: makeCategory("Food & Drink", 0.6), // keyword hit
-      dateResult: DEFAULT_DATE,
+      amountResult: makeAmount(5, 0.4),
+      merchantResult: NO_MERCHANT,
+      categoryResult: makeCategory("Food & Drink", 0.6),
     });
-    // Amount is present (0.40 >= 0.30)
     expect(missing).not.toContain("amount");
-    // Merchant confidence 0.10 < 0.20 → missing
     expect(missing).toContain("merchant");
-    // Category is not Unknown → not missing regardless of flag
     expect(missing).not.toContain("category");
-    // Default date is not missing (product decision)
     expect(missing).not.toContain("date");
   });
 
@@ -100,7 +97,6 @@ describe("detectMissingFields() — spec scenarios", () => {
       amountResult: makeAmount(45, 0.8),
       merchantResult: makeMerchant("Uber", 0.95),
       categoryResult: makeCategory("Transportation", 0.9),
-      dateResult: makeDate("relative", 0.8),
     });
     expect(missing).toHaveLength(0);
   });
@@ -110,11 +106,9 @@ describe("detectMissingFields() — spec scenarios", () => {
       amountResult: makeAmount(null, 0.1),
       merchantResult: NO_MERCHANT,
       categoryResult: makeCategory("Unknown", 0.2),
-      dateResult: DEFAULT_DATE,
     });
     expect(missing).toContain("amount");
     expect(missing).toContain("merchant");
-    // Category UNKNOWN is NOT flagged (product decision: UNKNOWN_CATEGORY_IS_MISSING = false)
     expect(missing).not.toContain("category");
   });
 
@@ -123,7 +117,6 @@ describe("detectMissingFields() — spec scenarios", () => {
       amountResult: makeAmount(null, 0.1),
       merchantResult: NO_MERCHANT,
       categoryResult: makeCategory("Food & Drink", 0.6),
-      dateResult: makeDate("relative", 0.8),
     });
     expect(missing).toContain("amount");
     expect(missing).toContain("merchant");
@@ -136,7 +129,6 @@ describe("detectMissingFields() — spec scenarios", () => {
       amountResult: makeAmount(null, 0.1),
       merchantResult: makeMerchant("Amazon", 0.95),
       categoryResult: makeCategory("Shopping", 0.9),
-      dateResult: DEFAULT_DATE,
     });
     expect(missing).toContain("amount");
     expect(missing).not.toContain("merchant");
@@ -158,7 +150,6 @@ describe("isAmountMissing()", () => {
   });
 
   it("value present, confidence below threshold → missing", () => {
-    // Confidence 0.10 (ambiguous multi-number penalty applied) — below 0.30
     expect(isAmountMissing(makeAmount(45, 0.1))).toBe(true);
   });
 
@@ -171,14 +162,13 @@ describe("isAmountMissing()", () => {
   });
 
   it("bare number (0.40 confidence) → NOT missing", () => {
-    // 0.40 = NUMBER_FOUND base — above 0.30 threshold
     expect(isAmountMissing(makeAmount(5, 0.4))).toBe(false);
   });
 });
 
-// // ─────────────────────────────────────────────────────────────────────────────
-// // isMerchantMissing() — unit tests
-// // ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// isMerchantMissing() — unit tests
+// ─────────────────────────────────────────────────────────────────────────────
 
 describe("isMerchantMissing()", () => {
   it("null merchant at NO_MATCH confidence (0.10) → missing", () => {
@@ -186,7 +176,6 @@ describe("isMerchantMissing()", () => {
   });
 
   it("null merchant at confidence exactly at threshold (0.20) → NOT missing", () => {
-    // Boundary: 0.20 >= 0.20 → not missing
     expect(isMerchantMissing(makeMerchant(null, MIN_CONFIDENCE.MERCHANT))).toBe(
       false,
     );
@@ -205,9 +194,9 @@ describe("isMerchantMissing()", () => {
   });
 });
 
-// // ─────────────────────────────────────────────────────────────────────────────
-// // isCategoryMissing() — product decision: UNKNOWN is NOT missing
-// // ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// isCategoryMissing() — product decision: UNKNOWN is NOT missing
+// ─────────────────────────────────────────────────────────────────────────────
 
 describe("isCategoryMissing()", () => {
   it("UNKNOWN category → NOT missing (product decision)", () => {
@@ -223,13 +212,13 @@ describe("isCategoryMissing()", () => {
   });
 });
 
-// // ─────────────────────────────────────────────────────────────────────────────
-// // isDateMissing() — product decision: default date is NOT missing
-// // ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// isDateMissing() — product decision: default date is NOT missing
+// ─────────────────────────────────────────────────────────────────────────────
 
 describe("isDateMissing()", () => {
   it("default date source → NOT missing (product decision)", () => {
-    expect(isDateMissing(DEFAULT_DATE)).toBe(false);
+    expect(isDateMissing(makeDate("default", 0.4))).toBe(false);
   });
 
   it("relative date source → NOT missing", () => {
@@ -241,9 +230,9 @@ describe("isDateMissing()", () => {
   });
 });
 
-// // ─────────────────────────────────────────────────────────────────────────────
-// // Stable output ordering
-// // ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// Stable output ordering
+// ─────────────────────────────────────────────────────────────────────────────
 
 describe("detectMissingFields() — output ordering", () => {
   it("returns missing fields in stable order: amount → merchant → category → date", () => {
@@ -251,9 +240,7 @@ describe("detectMissingFields() — output ordering", () => {
       amountResult: makeAmount(null, 0.1),
       merchantResult: NO_MERCHANT,
       categoryResult: makeCategory("Unknown", 0.2),
-      dateResult: DEFAULT_DATE,
     });
-    // Both amount and merchant are missing
     expect(missing[0]).toBe("amount");
     expect(missing[1]).toBe("merchant");
   });
@@ -263,7 +250,6 @@ describe("detectMissingFields() — output ordering", () => {
       amountResult: GOOD_AMOUNT,
       merchantResult: GOOD_MERCHANT,
       categoryResult: GOOD_CATEGORY,
-      dateResult: GOOD_DATE,
     });
     expect(missing).toHaveLength(0);
   });
@@ -273,23 +259,21 @@ describe("detectMissingFields() — output ordering", () => {
       amountResult: makeAmount(null, 0.1),
       merchantResult: GOOD_MERCHANT,
       categoryResult: GOOD_CATEGORY,
-      dateResult: GOOD_DATE,
     });
     expect(missing).toEqual(["amount"]);
   });
 });
 
-// // ─────────────────────────────────────────────────────────────────────────────
-// // Threshold boundary tests
-// // ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// Threshold boundary tests
+// ─────────────────────────────────────────────────────────────────────────────
 
 describe("detectMissingFields() — confidence boundary conditions", () => {
   it("amount at exactly MIN_CONFIDENCE.AMOUNT → NOT missing", () => {
     const missing = detectMissingFields({
-      amountResult: makeAmount(45, MIN_CONFIDENCE.AMOUNT), // 0.30
+      amountResult: makeAmount(45, MIN_CONFIDENCE.AMOUNT),
       merchantResult: GOOD_MERCHANT,
       categoryResult: GOOD_CATEGORY,
-      dateResult: GOOD_DATE,
     });
     expect(missing).not.toContain("amount");
   });
@@ -299,7 +283,6 @@ describe("detectMissingFields() — confidence boundary conditions", () => {
       amountResult: makeAmount(45, MIN_CONFIDENCE.AMOUNT - 0.01),
       merchantResult: GOOD_MERCHANT,
       categoryResult: GOOD_CATEGORY,
-      dateResult: GOOD_DATE,
     });
     expect(missing).toContain("amount");
   });
@@ -307,9 +290,8 @@ describe("detectMissingFields() — confidence boundary conditions", () => {
   it("merchant at exactly MIN_CONFIDENCE.MERCHANT → NOT missing", () => {
     const missing = detectMissingFields({
       amountResult: GOOD_AMOUNT,
-      merchantResult: makeMerchant(null, MIN_CONFIDENCE.MERCHANT), // 0.20
+      merchantResult: makeMerchant(null, MIN_CONFIDENCE.MERCHANT),
       categoryResult: GOOD_CATEGORY,
-      dateResult: GOOD_DATE,
     });
     expect(missing).not.toContain("merchant");
   });
@@ -319,7 +301,6 @@ describe("detectMissingFields() — confidence boundary conditions", () => {
       amountResult: GOOD_AMOUNT,
       merchantResult: makeMerchant(null, MIN_CONFIDENCE.MERCHANT - 0.01),
       categoryResult: GOOD_CATEGORY,
-      dateResult: GOOD_DATE,
     });
     expect(missing).toContain("merchant");
   });

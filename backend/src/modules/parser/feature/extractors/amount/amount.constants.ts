@@ -23,7 +23,38 @@ export const CURRENCY_CODES = {
 
 export type CurrencyCode = (typeof CURRENCY_CODES)[keyof typeof CURRENCY_CODES];
 
-export const DEFAULT_CURRENCY: CurrencyCode = CURRENCY_CODES.USD;
+/**
+ * Session/profile currency context passed into the parser from outside.
+ *
+ * Priority resolution order (highest → lowest):
+ *  1. Explicit currency in the input ("45 usd")
+ *  2. activeCurrency   — current session currency (updated after each parse)
+ *  3. userPreferredCurrency — persisted in DB, set at onboarding / settings
+ *  4. localeCurrency   — derived from browser locale
+ *  5. CURRENCY_CODES.USD — absolute last-resort fallback
+ */
+export type CurrencyContext = {
+  activeCurrency?: CurrencyCode | undefined;
+  userPreferredCurrency?: CurrencyCode | undefined;
+  localeCurrency?: CurrencyCode | undefined;
+};
+
+/**
+ * Resolve the final currency from an explicit match and context.
+ * Never use DEFAULT_CURRENCY directly outside this function.
+ */
+export function resolveCurrency(
+  explicitCurrency: CurrencyCode | undefined,
+  ctx?: CurrencyContext,
+): CurrencyCode {
+  return (
+    explicitCurrency ??
+    ctx?.activeCurrency ??
+    ctx?.userPreferredCurrency ??
+    ctx?.localeCurrency ??
+    CURRENCY_CODES.USD
+  );
+}
 
 /**
  * Maps normalized currency tokens (post-normalization-pipeline) to canonical codes.

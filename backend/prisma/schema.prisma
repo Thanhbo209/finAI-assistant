@@ -44,6 +44,8 @@ model User {
 
   role UserRole @default(USER)
 
+  preferredCurrency String @default("USD")
+
   createdAt DateTime @default(now())
 
   transactions Transaction[]

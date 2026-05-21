@@ -1,4 +1,8 @@
 import { AppError } from "../../common/error/app.error.js";
+import {
+  isSupportedCurrency,
+  normalizeCurrencyCode,
+} from "../../common/constants/currency.constants.js";
 import { comparePassword, hashPassword } from "../../common/util/bcrypt.js";
 import {
   generateAccessToken,
@@ -30,6 +34,7 @@ export const register = async ({ email, password }: RegisterBody) => {
   return {
     userId: user.id,
     email: user.email,
+    preferredCurrency: user.preferredCurrency,
   };
 };
 
@@ -50,6 +55,13 @@ export const login = async ({ email, password }: LoginBody) => {
   return {
     accessToken,
     refreshToken,
+
+    user: {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      preferredCurrency: user.preferredCurrency, // included so frontend can skip onboarding
+    },
   };
 };
 
@@ -63,6 +75,35 @@ export const getMe = async (userId: string) => {
     id: user.id,
     email: user.email,
     role: user.role,
+    preferredCurrency: user.preferredCurrency,
+    createdAt: user.createdAt,
+  };
+};
+
+export const updatePreferredCurrency = async (
+  userId: string,
+  currency: string,
+) => {
+  const normalizedCurrency = normalizeCurrencyCode(currency);
+
+  if (!isSupportedCurrency(normalizedCurrency)) {
+    throw new AppError(
+      400,
+      "VALIDATION_ERROR",
+      `Unsupported currency: ${currency}`,
+    );
+  }
+
+  const user = await authRepository.updatePreferredCurrency(
+    userId,
+    normalizedCurrency,
+  );
+
+  return {
+    id: user.id,
+    email: user.email,
+    role: user.role,
+    preferredCurrency: user.preferredCurrency,
     createdAt: user.createdAt,
   };
 };

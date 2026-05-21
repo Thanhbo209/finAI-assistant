@@ -1,6 +1,5 @@
 import {
   CURRENCY_TOKEN_MAP,
-  DEFAULT_CURRENCY,
   PATTERN_BARE_NUMBER,
   PATTERN_CURRENCY_PREFIX,
   PATTERN_CURRENCY_SUFFIX,
@@ -27,7 +26,9 @@ export function scanCurrencyPrefix(input: string): AmountCandidate[] {
       continue;
     }
     const value = parseFloat(rawNumber);
-    const currency = CURRENCY_TOKEN_MAP[symbol] ?? DEFAULT_CURRENCY;
+    // Paired scanners always resolve a real currency code — $ is always USD
+    const currency = CURRENCY_TOKEN_MAP[symbol];
+    if (!currency) continue;
     candidates.push({ value, currency, rawMatch, matchStrength: "paired" });
   }
 
@@ -52,7 +53,8 @@ export function scanCurrencySuffix(input: string): AmountCandidate[] {
       continue;
     }
     const value = parseFloat(rawNumber);
-    const currency = CURRENCY_TOKEN_MAP[symbol] ?? DEFAULT_CURRENCY;
+    const currency = CURRENCY_TOKEN_MAP[symbol];
+    if (!currency) continue;
 
     candidates.push({ value, currency, rawMatch, matchStrength: "paired" });
   }
@@ -77,8 +79,8 @@ export function scanNumberThenCurrency(input: string): AmountCandidate[] {
       continue;
     }
     const value = parseFloat(rawNumber);
-    const currency =
-      CURRENCY_TOKEN_MAP[currencyToken.toLowerCase()] ?? DEFAULT_CURRENCY;
+    const currency = CURRENCY_TOKEN_MAP[currencyToken.toLowerCase()];
+    if (!currency) continue;
 
     candidates.push({ value, currency, rawMatch, matchStrength: "paired" });
   }
@@ -102,8 +104,9 @@ export function scanCurrencyThenNumber(input: string): AmountCandidate[] {
       continue;
     }
     const value = parseFloat(rawNumber);
-    const currency =
-      CURRENCY_TOKEN_MAP[currencyToken.toLowerCase()] ?? DEFAULT_CURRENCY;
+    const currency = CURRENCY_TOKEN_MAP[currencyToken.toLowerCase()];
+    if (!currency) continue;
+
     candidates.push({ value, currency, rawMatch, matchStrength: "paired" });
   }
   return candidates;
@@ -112,7 +115,9 @@ export function scanCurrencyThenNumber(input: string): AmountCandidate[] {
 /**
  * Scan for bare numbers with no currency context: 45, 6.50
  * Lowest-priority scanner — only used when no paired candidate is found.
- * Returns bare candidates — currency defaults to USD.
+ *
+ * Returns bare candidates with currency = undefined.
+ * Currency will be resolved in extractAmount() via CurrencyContext.
  */
 
 export function scanBareNumbers(input: string): AmountCandidate[] {
@@ -132,7 +137,7 @@ export function scanBareNumbers(input: string): AmountCandidate[] {
 
     candidates.push({
       value,
-      currency: DEFAULT_CURRENCY,
+      currency: undefined, // resolved later via CurrencyContext
       rawMatch,
       matchStrength: "bare",
     });

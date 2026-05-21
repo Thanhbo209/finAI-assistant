@@ -1,4 +1,5 @@
 import { prisma } from "../../config/prisma.js";
+import { CURRENCY_ONBOARDING_SENTINEL } from "../../common/constants/currency.constants.js";
 
 export const findUserByEmail = async (email: string) => {
   return prisma.user.findUnique({
@@ -13,6 +14,7 @@ export const createUser = async (email: string, passwordHash: string) => {
     data: {
       email,
       passwordHash,
+      preferredCurrency: CURRENCY_ONBOARDING_SENTINEL,
     },
   });
 };
@@ -22,5 +24,15 @@ export const findUserById = async (id: string) => {
     where: {
       id,
     },
+  });
+};
+
+export const updatePreferredCurrency = async (
+  id: string,
+  preferredCurrency: string,
+) => {
+  return prisma.user.update({
+    where: { id },
+    data: { preferredCurrency },
   });
 };

@@ -14,7 +14,6 @@ export interface FindTransactionsParams {
 export interface SummaryDateFilter {
   dateFrom?: Date;
   dateTo?: Date;
-  currency?: string;
 }
 
 export class TransactionRepository {
@@ -114,7 +113,7 @@ export class TransactionRepository {
   }
 
   async monthlySummary(userId: string, filters?: SummaryDateFilter) {
-    const { dateFrom, dateTo, currency } = filters || {};
+    const { dateFrom, dateTo } = filters || {};
 
     return prisma.$queryRaw<
       Array<{
@@ -161,28 +160,41 @@ export class TransactionRepository {
             : Prisma.empty
         }
 
-        ${
-          currency
-            ? Prisma.sql`
-              AND "currency" = ${currency}
-            `
-            : Prisma.empty
-        }
-
       GROUP BY month
 
       ORDER BY month DESC
     `;
   }
 
-  async categorySummary(userId: string, filters?: SummaryDateFilter) {
+  async findForSummary(userId: string, filters?: SummaryDateFilter) {
     const where: Prisma.TransactionWhereInput = {
       ...this.baseWhere(userId),
     };
 
-    if (filters?.currency) {
-      where.currency = filters.currency;
+    if (filters?.dateFrom || filters?.dateTo) {
+      where.transactionDate = {};
+
+      if (filters.dateFrom) {
+        where.transactionDate.gte = filters.dateFrom;
+      }
+
+      if (filters.dateTo) {
+        where.transactionDate.lte = filters.dateTo;
+      }
     }
+
+    return prisma.transaction.findMany({
+      where,
+      orderBy: {
+        transactionDate: "desc",
+      },
+    });
+  }
+
+  async categorySummary(userId: string, filters?: SummaryDateFilter) {
+    const where: Prisma.TransactionWhereInput = {
+      ...this.baseWhere(userId),
+    };
 
     if (filters?.dateFrom || filters?.dateTo) {
       where.transactionDate = {};
@@ -225,10 +237,6 @@ export class TransactionRepository {
     const where: Prisma.TransactionWhereInput = {
       ...this.baseWhere(userId),
     };
-
-    if (filters?.currency) {
-      where.currency = filters.currency;
-    }
 
     if (filters?.dateFrom || filters?.dateTo) {
       where.transactionDate = {};
